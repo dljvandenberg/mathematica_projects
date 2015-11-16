@@ -1,0 +1,340 @@
+(***********************************************************************
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used on any computer system with Mathematica 4.0,
+MathReader 4.0, or any compatible application. The data for the notebook 
+starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do one of 
+the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing the 
+word CacheID, otherwise Mathematica-compatible applications may try to 
+use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+***********************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      9845,        257]*)
+(*NotebookOutlinePosition[     10497,        280]*)
+(*  CellTagsIndexPosition[     10453,        276]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+2-dimensionale elastische botsingen van 2 rollende homogene bolvormige \
+lichamen\
+\>", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Wet van behoud van energie", "Subsection"],
+
+Cell[BoxData[
+    \(\(cond1 = 
+        m1\ \((\(\(v1x\)\(\ \)\)\^2 + \(\(v1y\)\(\ \)\)\^2)\) + 
+            m2\ \((\(\(v2x\)\(\ \)\)\^2 + \(\(v2y\)\(\ \)\)\^2)\) == 
+          m1\ \((\(\(v3x\)\(\ \)\)\^2 + \(\(v3y\)\(\ \)\)\^2)\) + 
+            m2\ \((\(\(v4x\)\(\ \)\)\^2 + \(\(v4y\)\(\ \)\)\^2)\);\)\)], \
+"Input"],
+
+Cell[BoxData[
+    \(\(cond5 = 
+        m1\ \((\(\(v1x\)\(\ \)\)\^2 + \(\(v1y\)\(\ \)\)\^2)\) + 
+            m2\ \((\(\(v2x\)\(\ \)\)\^2 + \(\(v2y\)\(\ \)\)\^2)\) + \(i1\ \((\
+\(\(v1x\)\(\ \)\)\^2 + \(\(v1y\)\(\ \)\)\^2)\)\)\/\(\(r1\)\(\ \)\)\^2 + \(i2\ \
+\((\(\(v2x\)\(\ \)\)\^2 + \(\(v2y\)\(\ \)\)\^2)\)\)\/\(\(r2\)\(\ \)\)\^2\
+\[IndentingNewLine] == 
+          m1\ \((\(\(v3x\)\(\ \)\)\^2 + \(\(v3y\)\(\ \)\)\^2)\) + 
+            m2\ \((\(\(v4x\)\(\ \)\)\^2 + \(\(v4y\)\(\ \)\)\^2)\) + \(i1\ \((\
+\(\(v3x\)\(\ \)\)\^2 + \(\(v3y\)\(\ \)\)\^2)\)\)\/\(\(r1\)\(\ \)\)\^2 + \(i2\ \
+\((\(\(v4x\)\(\ \)\)\^2 + \(\(v4y\)\(\ \)\)\^2)\)\)\/\(\(r2\)\(\ \
+\)\)\^2;\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Wet van behoud van impuls", "Subsection"],
+
+Cell[BoxData[{
+    \(\(cond2 = 
+        m1\ v1x\  + m2\ v2x\  == 
+          m1\ v3x\  + m2\ v4x\ ;\)\), "\[IndentingNewLine]", 
+    \(\(cond3 = m1\ v1y\  + m2\ v2y\  == m1\ v3y\  + m2\ v4y\ ;\)\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Wet van behoud van impulsmoment", "Subsection"],
+
+Cell[BoxData[
+    \(\(cond4 = 
+        m1\ r1\ \((\((v3x\  - v1x\ )\) Cos[\[Beta]] + \((v1y\  - v3y\ )\) 
+                  Sin[\[Beta]])\) \[Equal] \ 
+          m2\ r2\ \((\((v4x\  - v2x\ )\) Cos[\[Beta]] + \((v2y\  - v4y\ )\) 
+                  Sin[\[Beta]])\);\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Traagheidsmomenten", "Subsection"],
+
+Cell[BoxData[{
+    \(\(V = \[Integral]\_0\%\[Pi]\(\[Integral]\_0\%\(2\ \
+\[Pi]\)\(\[Integral]\_0\%R r\^2\ Sin[\[CurlyPhi]] \[DifferentialD]r \
+\[DifferentialD]\[Theta] \[DifferentialD]\[CurlyPhi]\)\);\)\), "\n", 
+    \(\(\[Rho] = m/V;\)\), "\n", 
+    \(\(i = \[Integral]\_0\%\[Pi]\(\[Integral]\_0\%\(2\ \
+\[Pi]\)\(\[Integral]\_0\%R \[Rho]\ r\^2\ r\^2\ Sin[\[CurlyPhi]] \
+\[DifferentialD]r \[DifferentialD]\[Theta] \[DifferentialD]\[CurlyPhi]\)\);\)\
+\), "\n", 
+    \(\(3\ m\ R\^2\)\/5\)}], "SmallText"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Oplossingen", "Subsection"],
+
+Cell[BoxData[
+    \(\(sol1 = 
+        Solve[{cond1, cond2, cond3}, {v3x\ , v3y\ , v4x\ , 
+            v4y\ }];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(sol2 = 
+        Solve[{cond1, cond2, cond3, cond4}, {v3x\ , v3y\ , v4x\ , 
+            v4y\ }];\)\)], "Input"],
+
+Cell[BoxData[{
+    \(\(sol3 = 
+        Solve[{cond5, cond2, cond3, cond4}, {v3x\ , v3y\ , v4x\ , 
+            v4y\ }];\)\), "\[IndentingNewLine]", 
+    \(\(nosolution = Simplify[sol3[\([1]\)]];\)\), "\[IndentingNewLine]", 
+    \(\(generalsolution = Simplify[sol3[\([2]\)]];\)\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Afbeelden botsing", "Subsection"],
+
+Cell[BoxData[
+    \(showcollision1[collision___] := 
+      Module[{graphball1, graphball2, graphv1, graphv2, graphv3, graphv4, 
+          graphend3, graphend4}, \[IndentingNewLine]graphball1 = 
+          Graphics[
+            Circle[{r1\ Sin[\[Beta]], r1\ Cos[\[Beta]]}, 
+              r1\ ]]; \[IndentingNewLine]graphball2 = 
+          Graphics[
+            Circle[{\(-r2\)\ Sin[\[Beta]], \(-r2\)\ Cos[\[Beta]]}, 
+              r2\ ]]; \[IndentingNewLine]graphv1 = 
+          Graphics[
+            Line[{{r1\ Sin[\[Beta]] - v1x\ , 
+                  r1\ Cos[\[Beta]] - v1y\ }, {r1\ Sin[\[Beta]], 
+                  r1\ Cos[\[Beta]]}}]]; \[IndentingNewLine]graphv2 = 
+          Graphics[
+            Line[{{\(-r2\)\ Sin[\[Beta]] - v2x\ , \(-r2\)\ Cos[\[Beta]] - 
+                    v2y\ }, {\(-r2\)\ Sin[\[Beta]], \(-r2\)\ \
+Cos[\[Beta]]}}]]; \[IndentingNewLine]graphv3 = 
+          Graphics[
+            Line[{{r1\ Sin[\[Beta]], 
+                  r1\ Cos[\[Beta]]}, {r1\ Sin[\[Beta]] + v3x\ , 
+                  r1\ Cos[\[Beta]] + v3y\ }}]]; \[IndentingNewLine]graphv4 = 
+          Graphics[
+            Line[{{\(-r2\)\ Sin[\[Beta]], \(-r2\)\ Cos[\[Beta]]}, {\(-r2\)\ \
+Sin[\[Beta]] + v4x\ , \(-r2\)\ Cos[\[Beta]] + 
+                    v4y\ }}]]; \[IndentingNewLine]graphend3 = 
+          Graphics[
+            Disk[{r1\ Sin[\[Beta]] + v3x\ , 
+                r1\ Cos[\[Beta]] + v3y\ }, \((r1 + r2)\)/
+                50]]; \[IndentingNewLine]graphend4 = 
+          Graphics[
+            Disk[{\(-r2\)\ Sin[\[Beta]] + v4x\ , \(-r2\)\ Cos[\[Beta]] + 
+                  v4y\ }, \((r1 + r2)\)/
+                50]]; \[IndentingNewLine]Show[\({graphball1, graphball2, 
+                graphv1, graphv2, graphv3, graphv4, graphend3, graphend4} /. 
+              generalsolution\) /. collision, {AspectRatio \[Rule] Automatic, 
+            PlotRange \[Rule] \ All}]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Collision or no collision?", "Subsection"],
+
+Cell["\<\
+If[Mod[If[v1y\[Equal]v2y,Sign[v1x-v2x] Pi/2,ArcTan[(v1x-v2x)/(v1y-v2y)]]-\
+\[Beta],2 Pi]<Pi/2 || Mod[If[v1y\[Equal]v2y,Sign[v1x-v2x] \
+Pi/2,ArcTan[(v1x-v2x)/(v1y-v2y)]]-\[Beta],2 Pi]>
+3 Pi/2,generalsolution,nosolution]\
+\>", "SmallText"],
+
+Cell[BoxData[
+    \(showcollision[collision___] := 
+      Module[{graphball1, graphball2, graphv1, graphv2, graphv3, graphv4, 
+          graphend3, graphend4}, \[IndentingNewLine]graphball1 = 
+          Graphics[
+            Circle[{r1\ Sin[\[Beta]], r1\ Cos[\[Beta]]}, 
+              r1\ ]]; \[IndentingNewLine]graphball2 = 
+          Graphics[
+            Circle[{\(-r2\)\ Sin[\[Beta]], \(-r2\)\ Cos[\[Beta]]}, 
+              r2\ ]]; \[IndentingNewLine]graphv1 = 
+          Graphics[
+            Line[{{r1\ Sin[\[Beta]] - v1x\ , 
+                  r1\ Cos[\[Beta]] - v1y\ }, {r1\ Sin[\[Beta]], 
+                  r1\ Cos[\[Beta]]}}]]; \[IndentingNewLine]graphv2 = 
+          Graphics[
+            Line[{{\(-r2\)\ Sin[\[Beta]] - v2x\ , \(-r2\)\ Cos[\[Beta]] - 
+                    v2y\ }, {\(-r2\)\ Sin[\[Beta]], \(-r2\)\ \
+Cos[\[Beta]]}}]]; \[IndentingNewLine]graphv3 = 
+          Graphics[
+            Line[{{r1\ Sin[\[Beta]], 
+                  r1\ Cos[\[Beta]]}, {r1\ Sin[\[Beta]] + v3x\ , 
+                  r1\ Cos[\[Beta]] + v3y\ }}]]; \[IndentingNewLine]graphv4 = 
+          Graphics[
+            Line[{{\(-r2\)\ Sin[\[Beta]], \(-r2\)\ Cos[\[Beta]]}, {\(-r2\)\ \
+Sin[\[Beta]] + v4x\ , \(-r2\)\ Cos[\[Beta]] + 
+                    v4y\ }}]]; \[IndentingNewLine]graphend3 = 
+          Graphics[
+            Disk[{r1\ Sin[\[Beta]] + v3x\ , 
+                r1\ Cos[\[Beta]] + v3y\ }, \((r1 + r2)\)/
+                50]]; \[IndentingNewLine]graphend4 = 
+          Graphics[
+            Disk[{\(-r2\)\ Sin[\[Beta]] + v4x\ , \(-r2\)\ Cos[\[Beta]] + 
+                  v4y\ }, \((r1 + r2)\)/
+                50]]; \[IndentingNewLine]Show[\({graphball1, graphball2, 
+                graphv1, graphv2, graphv3, graphv4, graphend3, 
+                graphend4} /. \((If[
+                    Mod[If[v1y \[Equal] v2y, Sign[v1x - v2x]\ Pi/2, 
+                              ArcTan[\((v1x - v2x)\)/\((v1y - 
+                                      v2y)\)]] - \[Beta], 2\ Pi] < 
+                        Pi/2\  || \ 
+                      Mod[If[v1y \[Equal] v2y, Sign[v1x - v2x]\ Pi/2, 
+                              ArcTan[\((v1x - v2x)\)/\((v1y - 
+                                      v2y)\)]] - \[Beta], 2\ Pi] > 3\ Pi/2, 
+                    generalsolution, nosolution] /. collision)\)\) /. 
+            collision, {AspectRatio \[Rule] Automatic, 
+            PlotRange \[Rule] \ All}]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Testen", "Subsection"],
+
+Cell[BoxData[
+    \(\(showcollision[{m1 \[Rule] 1, m2 \[Rule] \ 1, r1 \[Rule] 1, 
+          r2 \[Rule]  .5, i1 \[Rule] 1, i2 \[Rule] 1, v1x \[Rule]  .5, 
+          v1y \[Rule] \(-1\), v2x \[Rule] \(- .5\), 
+          v2y \[Rule] 1, \[Beta] \[Rule] \ \(-Pi\)/2}];\)\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"4.0 for Microsoft Windows",
+ScreenRectangle->{{0, 800}, {0, 555}},
+WindowSize->{792, 528},
+WindowMargins->{{0, Automatic}, {Automatic, 0}}
+]
+
+
+(***********************************************************************
+Cached data follows.  If you edit this Notebook file directly, not using
+Mathematica, you must remove the line containing CacheID at the top of 
+the file.  The cache data will then be recreated when you save this file 
+from within Mathematica.
+***********************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1739, 51, 108, 3, 59, "Section"],
+
+Cell[CellGroupData[{
+Cell[1872, 58, 48, 0, 47, "Subsection"],
+Cell[1923, 60, 316, 6, 31, "Input"],
+Cell[2242, 68, 669, 11, 82, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2948, 84, 47, 0, 31, "Subsection"],
+Cell[2998, 86, 207, 4, 50, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3242, 95, 53, 0, 31, "Subsection"],
+Cell[3298, 97, 278, 5, 30, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3613, 107, 40, 0, 31, "Subsection"],
+Cell[3656, 109, 502, 9, 112, "SmallText"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[4195, 123, 33, 0, 31, "Subsection"],
+Cell[4231, 125, 125, 3, 30, "Input"],
+Cell[4359, 130, 132, 3, 30, "Input"],
+Cell[4494, 135, 289, 5, 70, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[4820, 145, 39, 0, 31, "Subsection"],
+Cell[4862, 147, 1877, 36, 250, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[6776, 188, 48, 0, 31, "Subsection"],
+Cell[6827, 190, 247, 5, 44, "SmallText"],
+Cell[7077, 197, 2395, 45, 310, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[9509, 247, 28, 0, 31, "Subsection"],
+Cell[9540, 249, 277, 4, 50, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+
+(***********************************************************************
+End of Mathematica Notebook file.
+***********************************************************************)
+

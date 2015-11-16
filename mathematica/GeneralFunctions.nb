@@ -1,0 +1,437 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     13802,        348]*)
+(*NotebookOutlinePosition[     14437,        370]*)
+(*  CellTagsIndexPosition[     14393,        366]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["General functions", "Title"],
+
+Cell["Useful for many purposes", "Subtitle"],
+
+Cell["\<\
+\[Copyright] 2006 Dennis van den Berg
+D.L.J.vandenBerg@phys.uu.nl\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Plotting", "Subsection"],
+
+Cell["\<\
+PrecisionPlot[data] plots the datapoints with their variances in both the x \
+and y directions. 'data' is a list consisting of 4-tuples {x, y, \[Sigma][x], \
+\[Sigma][y]} where \[Sigma][ ] is the variance of the particular variable.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(PrecisionPlot[data_] := 
+      Module[{hlines, vlines, alllines, 
+          pointsplot}, \[IndentingNewLine]hlines = 
+          Table[{{data[\([i, 1]\)] - data[\([i, 2]\)], 
+                data[\([i, 3]\)]}, {data[\([i, 1]\)] + data[\([i, 2]\)], 
+                data[\([i, 3]\)]}}, {i, 1, 
+              Length[data]}]; \[IndentingNewLine]vlines = 
+          Table[{{data[\([i, 1]\)], 
+                data[\([i, 3]\)] - data[\([i, 4]\)]}, {data[\([i, 1]\)], 
+                data[\([i, 3]\)] + data[\([i, 4]\)]}}, {i, 1, 
+              Length[data]}]; \[IndentingNewLine]alllines = 
+          Join[hlines, vlines]; \[IndentingNewLine]pointsplot = 
+          ListPlot[
+            data[\([All, {1, 3}]\)], {PlotStyle \[Rule] PointSize[ .02], 
+              DisplayFunction \[Rule] Identity}]; \[IndentingNewLine]Show[
+          pointsplot, 
+          Graphics[
+            Map[Line, alllines]], {DisplayFunction \[Rule] $DisplayFunction, 
+            PlotRange \[Rule] All}]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Numerical equation solving", "Subsection"],
+
+Cell[BoxData[
+    \(DiscreteMin[f_Function, argspace_List] := 
+      Min[Map[f, argspace]]\)], "Input"],
+
+Cell[BoxData[
+    \(DiscreteArgMin[f_Function, argspace_List] := 
+      Module[{fxlist, min, n, argmin}, \[IndentingNewLine]fxlist = 
+          Map[{f[#], #} &, argspace]; \[IndentingNewLine]min = 
+          Min[fxlist[\([\)\(All, 1\)\(]\)]]; \[IndentingNewLine]n = 
+          Length[argspace]; \[IndentingNewLine]For[\[IndentingNewLine]argmin \
+= Null; i = 1, \[IndentingNewLine]i \[LessEqual] 
+            n, \[IndentingNewLine]\(i++\), \[IndentingNewLine]If[
+            fxlist[\([\)\(i, 1\)\(]\)] \[Equal] 
+              min, \[IndentingNewLine]argmin = 
+              fxlist[\([\)\(i, 
+                2\)\(]\)]\[IndentingNewLine]]\[IndentingNewLine]]; \
+\[IndentingNewLine]argmin\[IndentingNewLine]]\)], "Input"],
+
+Cell["\<\
+FindZero[f[x], {x, x0, x1}] finds one point where f changes sign, provided \
+f[x0] and f[x1] have opposite signs. It does not use derivatives.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(FindZero[f_, varinfo_, yprecision_:  10\^\(-6\), maxiterations_:  100] := 
+      Module[{x, x0, x1, func, xf01, xfnext, 
+          xfnew}, \[IndentingNewLine]{x, x0, x1} = 
+          varinfo; \[IndentingNewLine]func = 
+          Function[
+            ReplaceAll[f, x \[Rule] #]]; \[IndentingNewLine]xf01 = {{x0, 
+              func[x0]}, {x1, func[x1]}}; \[IndentingNewLine]xfnext[xfold_] := 
+          Module[{xi, fi, xii, fii, a, b, xiii, 
+              fiii}, \[IndentingNewLine]{{xi, fi}, {xii, fii}} = 
+              xfold; \[IndentingNewLine]a = \((fii - fi)\)/\((xii - 
+                    xi)\); \[IndentingNewLine]b = 
+              fi - a\ xi; \[IndentingNewLine]xiii = \(-b\)/
+                a; \[IndentingNewLine]fiii = 
+              func[xiii]; \[IndentingNewLine]If[
+              fiii\ fi < 
+                0, {{xi, fi}, {xiii, fiii}}, {{xii, fii}, {xiii, fiii}}]]; 
+        xfnew = NestWhile[xfnext[#1] &, xf01, 
+            Min[Abs[#1[\([All, 2]\)]]] > yprecision &, 1, 
+            maxiterations]; \[IndentingNewLine]N[
+          xfnew[\([2, 1]\)]]]\)], "Input"],
+
+Cell["\<\
+FindZero2[f[x],{x,x0,x1}] finds one point where f changes sign, provided \
+f[x0] and f[x1] have opposite signs. It uses a simpler algorithm than \
+FindZero[ ] and its requested precision is given in terms of x.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(FindZero2[f_, varinfo_, xprecision_:  10\^\(-6\), 
+        maxiterations_:  100] := 
+      Module[{x, x0, x1, func, xf01, xfnext, 
+          xfnew}, \[IndentingNewLine]{x, x0, x1} = 
+          varinfo; \[IndentingNewLine]func = 
+          Function[
+            ReplaceAll[f, x \[Rule] #]]; \[IndentingNewLine]xf01 = {{x0, 
+              func[x0]}, {x1, func[x1]}}; \[IndentingNewLine]If[
+          xf01[\([\)\(1, 2\)\(]\)]\ xf01[\([\)\(2, 2\)\(]\)] > 
+            0, \[IndentingNewLine]x0, \[IndentingNewLine]xfnext[xfold_] := 
+            Module[{xi, fi, xii, fii, xiii, 
+                fiii}, \[IndentingNewLine]{{xi, fi}, {xii, fii}} = 
+                xfold; \[IndentingNewLine]xiii = \((xi + xii)\)/
+                  2; \[IndentingNewLine]fiii = 
+                func[xiii]; \[IndentingNewLine]If[
+                fiii\ fi < 
+                  0, {{xi, fi}, {xiii, fiii}}, {{xii, fii}, {xiii, 
+                    fiii}}]]; \[IndentingNewLine]xfnew = 
+            NestWhile[xfnext[#1] &, xf01, 
+              Abs[#1[\([\)\(2, 1\)\(]\)] - #1[\([\)\(1, 1\)\(]\)]] > 
+                  xprecision &, 1, maxiterations]; \[IndentingNewLine]N[
+            xfnew[\([\)\(2, 1\)\(]\)]]]]\)], "Input"],
+
+Cell["\<\
+MinQuadratic[f[x], {x, x0, x1}] numerically finds the minimum of f[x], if \
+f[x] is approximately quadratic in x and its minimum lies between x0 and \
+x1.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(MinQuadratic[f_, varinfo_, xprecision_:  10\^\(-6\), 
+        maxiterations_:  100] := 
+      Module[{x, x0, x1, func, xf01, xfnext, 
+          xfnew}, \[IndentingNewLine]{x, x0, x1} = 
+          varinfo; \[IndentingNewLine]func = 
+          Function[
+            ReplaceAll[f, x \[Rule] #]]; \[IndentingNewLine]xf01 = {{x0, 
+              func[x0]}, {x1, func[x1]}}; \[IndentingNewLine]xfnext[xfold_] := 
+          Module[{xi, fi, xii, fii, xiii, 
+              fiii}, \[IndentingNewLine]{{xi, fi}, {xii, fii}} = 
+              xfold; \[IndentingNewLine]xiii = \((xi + xii)\)/
+                2; \[IndentingNewLine]fiii = 
+              func[xiii]; \[IndentingNewLine]If[
+              fi < fii, {{xi, fi}, {xiii, fiii}}, {{xiii, fiii}, {xii, 
+                  fii}}]]; \[IndentingNewLine]xfnew = 
+          NestWhile[xfnext[#1] &, xf01, 
+            Abs[#1[\([\)\(2, 1\)\(]\)] - #1[\([\)\(1, 1\)\(]\)]] > 
+                xprecision &, 1, 
+            maxiterations]; \[IndentingNewLine]N[\((xfnew[\([\)\(1, 
+                  1\)\(]\)] + xfnew[\([\)\(2, 1\)\(]\)])\)/2]]\)], "Input"],
+
+Cell["\<\
+MinQuadratic2[f[x], {x, x0, x1}] does the same as MinQuadratic[ ], but \
+converges a little more slowly and works for functions that are 'less \
+quadratic'.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(MinQuadratic2[f_, varinfo_, xprecision_:  10\^\(-6\), 
+        maxiterations_:  100] := 
+      Module[{x, x0, x1, func, xf01, xfnext, 
+          xfnew}, \[IndentingNewLine]{x, x0, x1} = 
+          varinfo; \[IndentingNewLine]func = 
+          Function[
+            ReplaceAll[f, x \[Rule] #]]; \[IndentingNewLine]xf01 = {{x0, 
+              func[x0]}, {x1, func[x1]}}; \[IndentingNewLine]xfnext[xfold_] := 
+          Module[{xi, fi, xii, fii, xiii, 
+              fiii}, \[IndentingNewLine]{{xi, fi}, {xii, fii}} = 
+              xfold; \[IndentingNewLine]If[
+              fi < fii, \[IndentingNewLine]xiii = \((xi + 2  xii)\)/
+                  3; \[IndentingNewLine]fiii = 
+                func[xiii]; \[IndentingNewLine]{{xi, fi}, {xiii, 
+                  fiii}}, \[IndentingNewLine]xiii = \((2  xi + xii)\)/
+                  3; \[IndentingNewLine]fiii = 
+                func[xiii]; \[IndentingNewLine]{{xiii, fiii}, {xii, 
+                  fii}}]]; \[IndentingNewLine]xfnew = 
+          NestWhile[xfnext[#1] &, xf01, 
+            Abs[#1[\([\)\(2, 1\)\(]\)] - #1[\([\)\(1, 1\)\(]\)]] > 
+                xprecision &, 1, 
+            maxiterations]; \[IndentingNewLine]N[\((xfnew[\([\)\(1, 
+                  1\)\(]\)] + xfnew[\([\)\(2, 1\)\(]\)])\)/2]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Determine convex hull", "Subsection"],
+
+Cell["\<\
+LowerConvexHullPoints[pointlist] determines the lower part of the (ordered) \
+convex hull points of a given set of points.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(LowerConvexHullPoints[pointlist_List] := 
+      Module[{sortedlist, lowerpoints, nrpoints, p1, point1, p2, point2, 
+          minslope, slope, p2sel}, \[IndentingNewLine]sortedlist = 
+          Union[pointlist]; \
+\[IndentingNewLine]For[\[IndentingNewLine]nrpoints = 
+            Length[sortedlist]; \[IndentingNewLine]p1 = 
+            1; \[IndentingNewLine]lowerpoints = {sortedlist[\([p1]\)]}, \
+\[IndentingNewLine]p1 < 
+            nrpoints, \[IndentingNewLine]\(p1++\), \[IndentingNewLine]point1 \
+= sortedlist[\([p1]\)]; \[IndentingNewLine]For[\[IndentingNewLine]p2 = 
+              p1 + 1; \[IndentingNewLine]minslope = \(+Infinity\), \
+\[IndentingNewLine]p2 \[LessEqual] 
+              nrpoints, \[IndentingNewLine]\(p2++\), \
+\[IndentingNewLine]point2 = sortedlist[\([p2]\)]; \[IndentingNewLine]slope = 
+              If[point1[\([\)\(1\)\(]\)] \[NotEqual] 
+                  point2[\([\)\(1\)\(]\)], \[IndentingNewLine]\((point2[\([\)\
+\(2\)\(]\)] - point1[\([\)\(2\)\(]\)])\)/\((point2[\([\)\(1\)\(]\)] - 
+                      point1[\([\)\(1\)\(]\)])\), \
+\[IndentingNewLine]\(+Infinity\)]; \[IndentingNewLine]If[
+              slope \[LessEqual] minslope, \[IndentingNewLine]p2sel = 
+                p2; \[IndentingNewLine]minslope = 
+                slope]]; \[IndentingNewLine]lowerpoints = 
+            Append[lowerpoints, 
+              sortedlist[\([p2sel]\)]]; \[IndentingNewLine]p1 = 
+            p2sel - 1]; \[IndentingNewLine]lowerpoints]\)], "Input"],
+
+Cell["\<\
+UpperConvexHullPoints[pointlist] determines the upper part of the (ordered) \
+convex hull points of a given set of points.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(UpperConvexHullPoints[
+        pointlist_List] := \(-LowerConvexHullPoints[\(-pointlist\)]\)\)], \
+"Input"],
+
+Cell["\<\
+ConvexHullPoints[pointlist] determines the (ordered) convex hull points of a \
+given set of points.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(ConvexHullPoints[pointlist_List] := 
+      Module[{lowerpoints, upperpoints}, \[IndentingNewLine]lowerpoints = 
+          Drop[LowerConvexHullPoints[
+              pointlist], \(-1\)]; \[IndentingNewLine]upperpoints = 
+          Drop[UpperConvexHullPoints[
+              pointlist], \(-1\)]; \[IndentingNewLine]Join[lowerpoints, 
+          upperpoints]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Various", "Subsection"],
+
+Cell["Rounded[x, n] rounds x with a precision of n decimal digits.", "Text"],
+
+Cell[BoxData[
+    \(Rounded[x_, n_Integer] := N[Round[10^n\ x]/10^n]\)], "Input"],
+
+Cell["\<\
+ConvolutionProduct[f, g] gives the convolution product of pure functions f \
+and g. Its output is again a pure function.
+Note that this function is only being evaluated when it is given an argument. \
+This is actually something that I still want to fix.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(ConvolutionProduct[f_Function, g_Function] := 
+      Function[Integrate[f[x] g[# - x], {x, 0, #}]]\)], "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Test functions", "Section"],
+
+Cell[BoxData[{
+    \(\(data1 = 
+        Table[{i + Random[Real, 15], 15, i\^2/20 - 8 + Random[Real, 10], 
+            10}, {i, 1, 50}];\)\), "\n", 
+    \(\(PrecisionPlot[data1];\)\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(Plot[Erf[x] + x^2 - 5  x - 10 + 3.1  Log[x], {x, 0, 10}];\)\), "\n", 
+    \(FindZero[Erf[x] + x^2 - 5  x - 10 + 3.1\ Log[x], {x, 1, 10}]\), "\n", 
+    \(FindZero2[
+      Erf[x] + x^2 - 5  x - 10 + 3.1\ Log[x], {x, 1, 10}]\)}], "Input"],
+
+Cell[BoxData[
+    \(Rounded[Pi, 3]\)], "Input"],
+
+Cell[BoxData[{
+    \(\(Plot[
+        2.2\ x\^1.8 - x + 1.523, {x, 0, 1}];\)\), "\[IndentingNewLine]", 
+    \(MinQuadratic[
+      2.2\ x\^1.8 - x + 1.523, {x, 0, 1}]\), "\[IndentingNewLine]", 
+    \(MinQuadratic2[2.2\ x\^1.8 - x + 1.523, {x, 0, 1}]\)}], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{925, 672},
+WindowMargins->{{0, Automatic}, {Automatic, 0}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 34, 0, 88, "Title"],
+Cell[1813, 55, 44, 0, 52, "Subtitle"],
+Cell[1860, 57, 96, 3, 46, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1981, 64, 35, 0, 69, "Section"],
+
+Cell[CellGroupData[{
+Cell[2041, 68, 30, 0, 38, "Subsection"],
+Cell[2074, 70, 256, 4, 46, "Text"],
+Cell[2333, 76, 1010, 19, 155, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[3380, 100, 48, 0, 38, "Subsection"],
+Cell[3431, 102, 103, 2, 27, "Input"],
+Cell[3537, 106, 718, 12, 235, "Input"],
+Cell[4258, 120, 166, 3, 30, "Text"],
+Cell[4427, 125, 1103, 20, 240, "Input"],
+Cell[5533, 147, 234, 4, 46, "Text"],
+Cell[5770, 153, 1218, 22, 240, "Input"],
+Cell[6991, 177, 178, 4, 30, "Text"],
+Cell[7172, 183, 1107, 20, 208, "Input"],
+Cell[8282, 205, 180, 4, 30, "Text"],
+Cell[8465, 211, 1293, 23, 272, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[9795, 239, 43, 0, 38, "Subsection"],
+Cell[9841, 241, 146, 3, 30, "Text"],
+Cell[9990, 246, 1494, 25, 411, "Input"],
+Cell[11487, 273, 146, 3, 30, "Text"],
+Cell[11636, 278, 127, 3, 27, "Input"],
+Cell[11766, 283, 123, 3, 30, "Text"],
+Cell[11892, 288, 386, 7, 75, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[12315, 300, 29, 0, 38, "Subsection"],
+Cell[12347, 302, 76, 0, 30, "Text"],
+Cell[12426, 304, 81, 1, 27, "Input"],
+Cell[12510, 307, 277, 5, 46, "Text"],
+Cell[12790, 314, 131, 2, 27, "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[12970, 322, 33, 0, 39, "Section"],
+Cell[13006, 324, 193, 4, 48, "Input"],
+Cell[13202, 330, 258, 4, 59, "Input"],
+Cell[13463, 336, 47, 1, 27, "Input"],
+Cell[13513, 339, 261, 5, 71, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

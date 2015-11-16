@@ -1,0 +1,239 @@
+(***********************************************************************
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used on any computer system with Mathematica 4.0,
+MathReader 4.0, or any compatible application. The data for the notebook 
+starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do one of 
+the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing the 
+word CacheID, otherwise Mathematica-compatible applications may try to 
+use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+***********************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      5149,        164]*)
+(*NotebookOutlinePosition[      5801,        187]*)
+(*  CellTagsIndexPosition[      5757,        183]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["The double Pendulum", "Title"],
+
+Cell[CellGroupData[{
+
+Cell["Equation of motion after approximation", "Section"],
+
+Cell[BoxData[
+    RowBox[{
+      RowBox[{\(\[PartialD]\_t\), 
+        RowBox[{"(", 
+          RowBox[{\(\[PartialD]\_t\), 
+            RowBox[{"(", GridBox[{
+                  {\(\[CurlyPhi]\_1\)},
+                  {\(\[CurlyPhi]\_2\)}
+                  }], ")"}]}], ")"}]}], "=", 
+      RowBox[{"A", " ", 
+        RowBox[{"(", GridBox[{
+              {\(\[CurlyPhi]\_1\)},
+              {\(\[CurlyPhi]\_2\)}
+              }], ")"}]}]}]], "Text"],
+
+Cell[BoxData[
+    \(\(A = {{\(-\(\(g0 \((m1 + 
+                        m2)\)\)\/\(l1\ m1\)\)\), \(g0\ m2\)\/\(l1\ m1\)}, \
+{\(g0 \((m1 + m2)\)\)\/\(l1\ m1\), \(-\(\(g0 \((m1 + 
+                        m2)\)\)\/\(l1\ m1\)\)\)}};\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Solutions", "Section"],
+
+Cell[BoxData[{
+    \(\ \(vals = Eigenvalues[A] // Simplify;\)\), "\[IndentingNewLine]", 
+    \(\(vecs = Eigenvectors[A] // Simplify;\)\)}], "Input"],
+
+Cell[BoxData[{
+    \(phi1[t_] := 
+      vecs[\([1, 1]\)] \((c1\ E\^\(\(\@vals[\([1]\)]\) t\) + 
+              c2\ E\^\(\(-\@vals[\([1]\)]\) t\))\) + 
+        vecs[\([2, 1]\)] \((c3\ E\^\(\(\@vals[\([2]\)]\) t\) + 
+              c4\ E\^\(\(-\@vals[\([2]\)]\) t\))\)\), "\[IndentingNewLine]", 
+    \(phi2[t_] := 
+      vecs[\([1, 2]\)] \((c1\ E\^\(\(\@vals[\([1]\)]\) t\) + 
+              c2\ E\^\(\(-\@vals[\([1]\)]\) t\))\) + 
+        vecs[\([2, 2]\)] \((c3\ E\^\(\(\@vals[\([2]\)]\) t\) + 
+              c4\ E\^\(\(-\@vals[\([2]\)]\) t\))\)\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Begin conditions", "Section"],
+
+Cell[BoxData[{
+    \(\({e, f} = vecs[\([1]\)];\)\), "\[IndentingNewLine]", 
+    \(\({g, h} = vecs[\([2]\)];\)\), "\[IndentingNewLine]", 
+    \(\({i, j} = \@vals;\)\), "\[IndentingNewLine]", 
+    \(\(B = {{e, e, g, g}, {e\ i, \(-e\)\ i, g\ j, \(-g\)\ j}, {f, f, h, 
+            h}, {f\ i, \(-f\)\ i, h\ i, \(-h\)\ i}};\)\)}], "Input"],
+
+Cell[BoxData[
+    \(\(Binv = Inverse[B] // Simplify;\)\)], "Input"],
+
+Cell[BoxData[
+    \(\({c1, c2, c3, c4} = Binv\  . {a, b, c, d} // Simplify;\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(pendulum = {m1 \[Rule] 1, m2 \[Rule] 1, l1 \[Rule] 5, l2 \[Rule] 3, 
+          g0 \[Rule] 9.81};\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(conditions = {a \[Rule] 1, b \[Rule] 0, c \[Rule] 0, 
+          d \[Rule] 0};\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Plot angles", "Section"],
+
+Cell[BoxData[{
+    \(\(plot1 = 
+        Plot[Evaluate[\(phi1[t] /. pendulum\) /. conditions], {t, 0, 
+            5}];\)\), "\[IndentingNewLine]", 
+    \(\(plot2 = 
+        Plot[Evaluate[\(phi2[t] /. pendulum\) /. conditions], {t, 0, 
+            5}];\)\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Trajectories", "Section"],
+
+Cell[BoxData[{
+    \(x1[t_] := l1\ Sin[phi1[t]]\), "\[IndentingNewLine]", 
+    \(y1[t_] := l2 + \((1 - \ Cos[phi1[t]])\)\), "\[IndentingNewLine]", 
+    \(x2[t_] := 
+      l1\ Sin[phi1[t]] + l2\ Sin[phi2[t]]\), "\[IndentingNewLine]", 
+    \(y2[t_] := 
+      l1\ \((1 - Cos[phi1[t]])\) + l2\ \((1 - Cos[phi2[t]])\)\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Plot trajectories", "Section"],
+
+Cell[BoxData[
+    \(\(plot3 = 
+        ParametricPlot[
+          Evaluate[\({x2[t], y2[t]} /. pendulum\) /. conditions], {t, 0, 
+            10}];\)\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"4.0 for Microsoft Windows",
+ScreenRectangle->{{0, 800}, {0, 555}},
+WindowSize->{792, 528},
+WindowMargins->{{0, Automatic}, {Automatic, 0}}
+]
+
+
+(***********************************************************************
+Cached data follows.  If you edit this Notebook file directly, not using
+Mathematica, you must remove the line containing CacheID at the top of 
+the file.  The cache data will then be recreated when you save this file 
+from within Mathematica.
+***********************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1739, 51, 36, 0, 115, "Title"],
+
+Cell[CellGroupData[{
+Cell[1800, 55, 57, 0, 59, "Section"],
+Cell[1860, 57, 447, 13, 43, "Text"],
+Cell[2310, 72, 242, 4, 42, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2589, 81, 28, 0, 39, "Section"],
+Cell[2620, 83, 148, 2, 50, "Input"],
+Cell[2771, 87, 555, 10, 125, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3363, 102, 35, 0, 39, "Section"],
+Cell[3401, 104, 333, 5, 92, "Input"],
+Cell[3737, 111, 67, 1, 30, "Input"],
+Cell[3807, 114, 90, 1, 30, "Input"],
+Cell[3900, 117, 133, 2, 30, "Input"],
+Cell[4036, 121, 114, 2, 30, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[4187, 128, 30, 0, 39, "Section"],
+Cell[4220, 130, 267, 6, 50, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[4524, 141, 31, 0, 39, "Section"],
+Cell[4558, 143, 326, 6, 90, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[4921, 154, 36, 0, 39, "Section"],
+Cell[4960, 156, 161, 4, 30, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+
+(***********************************************************************
+End of Mathematica Notebook file.
+***********************************************************************)
+

@@ -1,0 +1,491 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     13669,        375]*)
+(*NotebookOutlinePosition[     14325,        398]*)
+(*  CellTagsIndexPosition[     14281,        394]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Runge-Kutta Equation Solver", "Title"],
+
+Cell["\<\
+Applied to Many Particle Systems and using classical Equations Of \
+Motion\
+\>", "Subtitle"],
+
+Cell["\<\
+Dennis van den Berg
+DLJvandenBerg@gmail.com\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["General", "Subsection"],
+
+Cell["\<\
+ToPureFunction[expression, vars] replaces the variables 'vars' in \
+'expression' by slots #1, #2, ... and subsequently makes a pure function of \
+the result.
+Note: every variable in ' vars' has to have no value assigned to it, \
+otherwise this goes wrong. The extra attribute HoldAll does not seem to solve \
+this (because the function uses Evaluate[]?).\
+\>", "Text"],
+
+Cell[BoxData[{
+    \(SetAttributes[ToPureFunction, HoldAll]\), "\[IndentingNewLine]", 
+    \(ToPureFunction[expr_, vars_List] := 
+      Module[{replacements}, \[IndentingNewLine]replacements = 
+          Table[vars[\([\)\(i\)\(]\)] \[Rule] Slot[i], {i, 1, 
+              Length[vars]}]; \[IndentingNewLine]Function[
+          Evaluate[expr /. replacements]]]\)}], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Runge-Kutta", "Subsection"],
+
+Cell[TextData[{
+  "RK4[FOM, state, step] applies the fourth-order Runge-Kutta method on the \
+problem ",
+  Cell[BoxData[
+      \(TraditionalForm\`FOM\ [state]\)]],
+  " = ",
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PartialD]\_t\)\(\ \)\(state\)\(\ \)\)\)]],
+  "to find a new state a time step 'step' later. This Equation Of Motion is \
+therefore defined by the Function Of Motion (FOM) and together with the \
+starting conditions 'state' this constitutes the problem. Note that 'FOM' and \
+'state' have to be of the same length, although to be precise 'FOM' is a pure \
+function of a list and 'state' is just a list.\nAn example of an application \
+is a system of 2 equal mass particles moving in each others gravitational \
+field, which can be described by:\n\tstate = {q1, q2, p1, p2} with qi and pi \
+vectors,\n\tFOM = {#[[3]]/m, #[[4]]/m, ",
+  Cell[BoxData[
+      \(g\ m\^2\ \(#[\([\)\(2\)\(]\)] - #[\([\)\(1\)\(]\)]\)\/Norm[#[\([\)\(2\
+\)\(]\)] - #[\([\)\(1\)\(]\)]]\^3, \ 
+      g\ m\^2\ \(#[\([\)\(1\)\(]\)] - #[\([\)\(2\)\(]\)]\)\/Norm[#[\([\)\(1\)\
+\(]\)] - #[\([\)\(2\)\(]\)]]\^3\)]],
+  "}&."
+}], "Text"],
+
+Cell[BoxData[
+    \(RK4[FOM_Function, state_List, 
+        step_] := \[IndentingNewLine]Module[{FOMstate, k1list, k2list, 
+          k3list, k4list}, \[IndentingNewLine]FOMstate = 
+          FOM[Apply[Sequence, #]] &; \[IndentingNewLine]k1list = 
+          FOMstate[state]; \[IndentingNewLine]k2list = 
+          FOMstate[state + step/2\ k1list]; \[IndentingNewLine]k3list = 
+          FOMstate[state + step/2\ k2list]; \[IndentingNewLine]k4list = 
+          FOMstate[state + step\ k3list]; \[IndentingNewLine]state + 
+          step/6 \((k1list + 2\ k2list + 2\ k3list + k4list)\)]\)], "Input"],
+
+Cell["\<\
+NestedRK4[functions, state, step, nrstep] gives a list of \
+iterations for RK4[functions, #, step] repeatedly being applied to a starting \
+condition 'state' with time step 'step'. Note that this output list has \
+lenght nrsteps+1.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(NestedRK4[FOM_Function, state_List, step_, 
+        nrsteps_Integer] := \[IndentingNewLine]If[
+        Length[Apply[Identity, FOM]] \[NotEqual] 
+          Length[state], \[IndentingNewLine]Print["\<FOM and state have \
+unequal lengths.\>"]; 
+        state, \[IndentingNewLine]NestList[RK4[FOM, #, step] &, state, 
+          nrsteps]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Generate Hamiltonian for gravity:", "Subsection"],
+
+Cell["\<\
+GravityHamiltonian[ ] generates the Hamiltonian for n particles \
+with masses {m1, m2, ...mn} moving in each others gravitational field with \
+gravitational constant g. It works for an arbitrary number of \
+dimensions.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(GravityHamiltonian[n_Integer, dim_Integer, masses_List, g_] := 
+      Module[{T, V}, \[IndentingNewLine]T = 
+          1/2\ Sum[\[IndentingNewLine]1/
+                  masses[\([i]\)]\ Sum[\[IndentingNewLine]Slot[
+                      dim\ \((i + n - 1)\) + d]^2\[IndentingNewLine], {d, 1, 
+                    dim}], \[IndentingNewLine]{i, 1, 
+                n}]; \[IndentingNewLine]V = \(-g\)\ \
+Sum[\[IndentingNewLine]masses[\([\)\(i\)\(]\)]\ \
+Sum[\[IndentingNewLine]masses[\([\)\(j\)\(]\)]/
+                    Sqrt[Sum[\[IndentingNewLine]\((Slot[
+                                dim\ \((j - 1)\) + d] - 
+                              Slot[dim\ \((i - 1)\) + 
+                                  d])\)^2, \[IndentingNewLine]{d, 1, 
+                          dim}]], \[IndentingNewLine]{j, 1, 
+                    i - 1}], \[IndentingNewLine]{i, 1, 
+                n}]; \[IndentingNewLine]Function[Evaluate[T + V]]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Functions Of Motion", "Subsection"],
+
+Cell[BoxData[{
+    FormBox[
+      RowBox[{
+        RowBox[{\(For\ a\ classical\ mechanical\ problem\ with\ Equations\ Of\
+\ Motion\ \((EOM)\)\), "\[IndentingNewLine]", 
+          RowBox[{\(\[PartialD]\_t\ state\), "=", 
+            FormBox[
+              RowBox[{
+                FormBox[\(\(FOM\)\(\ \)\),
+                  "TraditionalForm"], "[", "state"}],
+              "TraditionalForm"]}]}], "]"}], 
+      TraditionalForm], "\[IndentingNewLine]", 
+    FormBox[\(we\ first\ want\ to\ define\ the\ Function\ Of\ Motion\ ' \
+\(\(FOM'\)\(.\)\)\), TraditionalForm]}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell["Derive 'general' Functions Of Motion from Hamiltonian", "Subsubsection"],
+
+Cell["\<\
+TimeIndependentFOM[H, n, dim] derives the FOM's for a \
+'dim'-dimensional 'n'-particles system described by Hamiltonian 'H'. Note \
+that 'H' has to be time-independent are expressed in Carthesian coordinates \
+(because of the spatial derivatives).\
+\>", "Text"],
+
+Cell[BoxData[
+    \(TimeIndependentFOM[H_Function, n_Integer, dim_Integer] := 
+      Module[{qdot, pdot, qdotlist, 
+          pdotlist}, \[IndentingNewLine]qdot[i_Integer] := 
+          D[Apply[Identity, H], Slot[i + dim\ n]]; \[IndentingNewLine]pdot[
+            i_Integer] := \(-D[Apply[Identity, H], 
+              Slot[i]]\); \[IndentingNewLine]qdotlist = 
+          Table[qdot[i], {i, 1, dim\ n}]; \[IndentingNewLine]pdotlist = 
+          Table[pdot[i], {i, 1, dim\ n}]; \[IndentingNewLine]Function[
+          Evaluate[Join[qdotlist, pdotlist]]]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["FOM for Gravity", "Subsubsection"],
+
+Cell[TextData[{
+  "GravityFOM[n, dim, masses, g] gives a pure function of a list {",
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PartialD]\_t\ q1\)\(\ \)\(,\)\)\)]],
+  Cell[BoxData[
+      \(TraditionalForm\`\[PartialD]\_t\ q2, , \)]],
+  "...,",
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PartialD]\_t\ p1\)\(\ \)\(,\)\(\ \)\)\)]],
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PartialD]\_t\ p2\)\(\ \)\(,\)\)\)]],
+  "...}& for n particles in dim dimensions with masses {m1, m2, ...} moving \
+in each others gravitatrional field. Applying 'FOM' to a sequence q1, q2, ... \
+p1, p2, ... generates a list of values {",
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PartialD]\_t\ q1\)\(\ \)\(,\)\)\)]],
+  Cell[BoxData[
+      \(TraditionalForm\`\[PartialD]\_t\ q2, , \)]],
+  "...,",
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PartialD]\_t\ p1\)\(\ \)\(,\)\(\ \)\)\)]],
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PartialD]\_t\ p2\)\(\ \)\(,\)\)\)]],
+  "...}."
+}], "Text"],
+
+Cell[BoxData[
+    \(GravityFOM[n_Integer, dim_Integer, masses_List, g_] := 
+      Module[{qdot, pdot, qdotlist, 
+          pdotlist}, \[IndentingNewLine]qdot[i_Integer, d_Integer] := 
+          Slot[dim \((i + n - 1)\) + d]/
+            masses[\([i]\)]; \[IndentingNewLine]pdot[i_Integer, d_Integer] := 
+          g\ masses[\([i]\)]\ Sum[\[IndentingNewLine]If[
+                i \[NotEqual] 
+                  j, \[IndentingNewLine]masses[\([j]\)] \((Slot[
+                          dim \((j - 1)\) + d] - Slot[dim \((i - 1)\) + d])\)/
+                    Sqrt[Sum[\((Slot[dim \((j - 1)\) + s] - 
+                                Slot[dim \((i - 1)\) + s])\)^2, {s, 1, 
+                            3}]]^3, \[IndentingNewLine]0], \
+\[IndentingNewLine]{j, 1, n}]; \[IndentingNewLine]qdotlist = 
+          Flatten[Table[qdot[i, d], {i, 1, n}, {d, 1, dim}], 
+            1]; \[IndentingNewLine]pdotlist = 
+          Flatten[Table[pdot[i, d], {i, 1, n}, {d, 1, dim}], 
+            1]; \[IndentingNewLine]Function[
+          Evaluate[Join[qdotlist, pdotlist]]]]\)], "Input"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Graphics", "Subsection"],
+
+Cell["\<\
+PlotParticles[ ] plots the particles in a real space x-y \
+projection, if state is of the form {q1, q2, ... , p1, p2, ...}.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(PlotParticles[state_List, dim_:  2] := 
+      Module[{n, xlist, ylist, xycoordinates}, \[IndentingNewLine]n = 
+          Length[state]/\((2\ dim)\); \[IndentingNewLine]xlist = 
+          Take[state, {1, dim\ n, dim}]; \[IndentingNewLine]ylist = 
+          Take[state, {2, dim\ n, dim}]; \[IndentingNewLine]xycoordinates = 
+          Table[{xlist[\([\)\(i\)\(]\)], ylist[\([\)\(i\)\(]\)]}, {i, 1, 
+              n}]; \[IndentingNewLine]ListPlot[xycoordinates, 
+          ImageSize \[Rule] 800, 
+          PlotRange \[Rule] {{\(-1.1\), 1.1}, {\(-1.1\), 1.1}}, 
+          AxesLabel \[Rule] {"\<x\>", "\<y\>"}]]\)], "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Calculations", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Simulation 1", "Subsubsection"],
+
+Cell[BoxData[{
+    \(\(n1 = 3;\)\), "\n", 
+    \(\(dim1 = 3;\)\), "\n", 
+    \(\(masses1 = {1, 1, 1};\)\), "\n", 
+    \(\(g1 =  .1;\)\), "\[IndentingNewLine]", 
+    \(\(state1 = {\(- .3\), 0, 0,  .3, 0, 0, 0, 0, 0,  .3, \(- .3\), 
+          0,  .3, \(- .3\), 0, \(- .6\),  .6, 0};\)\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(Hgrav1 = GravityHamiltonian[n1, dim1, masses1, g1];\)\), "\n", 
+    \(\(FOMgrav1 = TimeIndependentFOM[Hgrav1, n1, dim1];\)\)}], "Input"],
+
+Cell[BoxData[
+    \(\(allstates1 = NestedRK4[FOMgrav1, state1,  .01, 100];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(\(PlotParticles[allstates1[\([#]\)], dim1] &\)\  /@ 
+        Range[1, Length[allstates1], 10];\)\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Simulation 2", "Subsubsection"],
+
+Cell[BoxData[{
+    \(\(n2 = 4;\)\), "\n", 
+    \(\(dim2 = 3;\)\), "\n", 
+    \(\(masses2 = {10, 1,  .05,  .1};\)\), "\n", 
+    \(\(g2 =  .1;\)\), "\[IndentingNewLine]", 
+    \(\(state2 = {0, 0, 0,  .5, 0, 0,  .6, 0, \(- .05\), \(- .2\), 
+          0,  .1, \(- .05\), \(-1.82\), \(- .05\), 0, 1.5, 0, 0,  .12, 
+          0,  .05,  .2,  .05};\)\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(Hgrav2 = GravityHamiltonian[n2, dim2, masses2, g2];\)\), "\n", 
+    \(\(FOMgrav2 = TimeIndependentFOM[Hgrav2, n2, dim2];\)\)}], "Input"],
+
+Cell[BoxData[
+    \(\(allstates2 = NestedRK4[FOMgrav2, state2,  .01, 400];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(animation2 = \(PlotParticles[allstates2[\([#]\)], dim2] &\)\  /@ 
+          Range[1, Length[allstates2], 5];\)\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Simulation 3", "Subsubsection"],
+
+Cell[BoxData[{
+    \(\(n3 = 1;\)\), "\n", 
+    \(\(dim3 = 2;\)\), "\[IndentingNewLine]", 
+    \(\(m = 1;\)\), "\n", 
+    \(\(state3 = { .3, 0,  .1,  .2};\)\), "\[IndentingNewLine]", 
+    \(\(H3 = \(px\^2 + py\^2\)\/\(2  m\) + \(m\/2\) \((x\^2 + 
+                y \((y - 1)\))\);\)\)}], "Input"],
+
+Cell[BoxData[
+    \(\(H3Function = ToPureFunction[H3, {x, y, px, py}];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(FOM3 = TimeIndependentFOM[H3Function, n3, dim3];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(allstates3 = NestedRK4[FOM3, state3,  .01, 500];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(animation3 = \(PlotParticles[allstates3[\([#]\)], dim3] &\)\  /@ 
+          Range[1, Length[allstates3], 50];\)\)], "Input"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 696}},
+WindowSize->{913, 669},
+WindowMargins->{{4, Automatic}, {Automatic, 1}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 44, 0, 88, "Title"],
+Cell[1823, 55, 102, 3, 52, "Subtitle"],
+Cell[1928, 60, 74, 3, 46, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[2027, 67, 28, 0, 69, "Section"],
+
+Cell[CellGroupData[{
+Cell[2080, 71, 29, 0, 38, "Subsection"],
+Cell[2112, 73, 378, 7, 62, "Text"],
+Cell[2493, 82, 372, 6, 75, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[2902, 93, 33, 0, 38, "Subsection"],
+Cell[2938, 95, 1119, 22, 116, "Text"],
+Cell[4060, 119, 595, 9, 139, "Input"],
+Cell[4658, 130, 255, 5, 46, "Text"],
+Cell[4916, 137, 366, 7, 75, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[5319, 149, 55, 0, 38, "Subsection"],
+Cell[5377, 151, 242, 5, 46, "Text"],
+Cell[5622, 158, 953, 16, 235, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6612, 179, 41, 0, 38, "Subsection"],
+Cell[6656, 181, 577, 13, 58, "Text"],
+
+Cell[CellGroupData[{
+Cell[7258, 198, 78, 0, 28, "Subsubsection"],
+Cell[7339, 200, 271, 5, 46, "Text"],
+Cell[7613, 207, 564, 9, 123, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[8214, 221, 40, 0, 28, "Subsubsection"],
+Cell[8257, 223, 981, 24, 46, "Text"],
+Cell[9241, 249, 1067, 18, 203, "Input"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[10357, 273, 30, 0, 38, "Subsection"],
+Cell[10390, 275, 147, 3, 30, "Text"],
+Cell[10540, 280, 640, 10, 123, "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[11229, 296, 31, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[11285, 300, 37, 0, 28, "Subsubsection"],
+Cell[11325, 302, 296, 6, 91, "Input"],
+Cell[11624, 310, 159, 2, 43, "Input"],
+Cell[11786, 314, 89, 1, 27, "Input"],
+Cell[11878, 317, 131, 2, 27, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[12046, 324, 37, 0, 28, "Subsubsection"],
+Cell[12086, 326, 356, 7, 107, "Input"],
+Cell[12445, 335, 159, 2, 43, "Input"],
+Cell[12607, 339, 89, 1, 27, "Input"],
+Cell[12699, 342, 145, 2, 27, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[12881, 349, 37, 0, 28, "Subsubsection"],
+Cell[12921, 351, 295, 6, 111, "Input"],
+Cell[13219, 359, 85, 1, 27, "Input"],
+Cell[13307, 362, 85, 1, 27, "Input"],
+Cell[13395, 365, 85, 1, 27, "Input"],
+Cell[13483, 368, 146, 2, 27, "Input"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

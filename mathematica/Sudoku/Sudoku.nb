@@ -1,0 +1,496 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     12291,        374]*)
+(*NotebookOutlinePosition[     13040,        402]*)
+(*  CellTagsIndexPosition[     12967,        396]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Sudoku solver", "Title"],
+
+Cell["\<\
+For puzzles with unique solution
+Inefficient method\
+\>", "Subtitle"],
+
+Cell["\<\
+\[Copyright] 2005-2006 Dennis van den Berg
+D.L.J.vandenBerg@phys.uu.nl\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Initialisation", "Section"],
+
+Cell["<< LinearAlgebra`MatrixManipulation`", "Input",
+  CellTags->"S5.51.1"],
+
+Cell[BoxData[
+    \(\(SetDirectory["\</Users/dennis/Documents/Projects/Computer/Mathematica/\
+Sudoku\>"];\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["General functions", "Subsubsection"],
+
+Cell["\<\
+EmptyNumber[] gives the number of empty (zero) entries in matrix.\
+\
+\>", "Text"],
+
+Cell[BoxData[
+    \(EmptyNumber[matrix_] := 
+      Length[Select[Flatten[matrix], # \[Equal] 0 &]]\)], "Input"],
+
+Cell[TextData[{
+  "PossibleList gives a list of possible new values for ",
+  Cell[BoxData[
+      \(TraditionalForm\`matrix\_ij\)]],
+  ".Note that this only works correctly for empty (zero) entries."
+}], "Text"],
+
+Cell[BoxData[
+    \(PossibleList[matrix_, i_, j_] := 
+      If[matrix[\([i, j]\)] \[Equal] 0, \[IndentingNewLine]Complement[
+          Range[0, 9], 
+          Union[matrix[\([i, All]\)], matrix[\([All, j]\)], 
+            Flatten[matrix[\([Range[i - Mod[i - 1, 3], 
+                    i + 2 - Mod[i - 1, 3]], 
+                  Range[j - Mod[j - 1, 3], 
+                    j + 2 - 
+                      Mod[j - 1, 3]]]\)]]]], \[IndentingNewLine]{matrix[\([i, 
+              j]\)]}]\)], "Input"],
+
+Cell[TextData[{
+  "PossibleTable[] gives a matrix possmatrix with entry ",
+  Cell[BoxData[
+      \(TraditionalForm\`possmatrix\_ij\)]],
+  "being the list of possible numbers at entry ",
+  Cell[BoxData[
+      \(TraditionalForm\`matrix\_ij\)]],
+  "in the puzzle."
+}], "Text"],
+
+Cell[BoxData[
+    \(PossibleTable[matrix_] := 
+      Table[PossibleList[matrix, i, j], {i, 9}, {j, 9}]\)], "Input"],
+
+Cell["\<\
+NonzeroPossQ[] checks if possmatrix contains any entries with zero \
+possibilities. An output being 'False' means there are no solutions.\
+\>", \
+"Text"],
+
+Cell[BoxData[
+    \(NonzeroPossQ[
+        possmatrix_] := \((Min[\(Length[#] &\)\  /@ 
+              Flatten[possmatrix, 1]] \[NotEqual] 0)\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Strategy A", "Subsubsection"],
+
+Cell["\<\
+IterationA gives a new matrix obtained from matrix by substituting \
+some zero entries with unique possible values.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(IterationA[matrix_] := 
+      Table[\[IndentingNewLine]If[
+          Length[PossibleList[matrix, i, j]] \[Equal] 
+            1, \[IndentingNewLine]First[
+            PossibleList[matrix, i, j]], \[IndentingNewLine]matrix[\([i, 
+              j]\)]], \[IndentingNewLine]{i, 9}, {j, 9}]\)], "Input"],
+
+Cell["\<\
+StrategyA repeatedly applies function IterationA to matrix until \
+the obtained matrix does not change anymore.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(StrategyA[matrix_] := 
+      Module[{iteratedmatrix}, \[IndentingNewLine]If[
+          iteratedmatrix = IterationA[matrix]; 
+          iteratedmatrix \[Equal] 
+            matrix, \[IndentingNewLine]iteratedmatrix, \
+\[IndentingNewLine]StrategyA[iteratedmatrix]]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Strategy B", "Subsubsection"],
+
+Cell["\<\
+NewEntriesB[] determines some new entries of matrix using a better \
+method than used in Strategy A.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(NewEntriesB[matrix_] := 
+      Module[{posstbl}, \[IndentingNewLine]posstbl = 
+          PossibleTable[
+            matrix]; \[IndentingNewLine]Union[\[IndentingNewLine]Flatten[
+            Table[\({i, \(Position[posstbl[\([i, All]\)], #, 2]\)[\([1, 
+                        1]\)], #} &\)\  /@ 
+                Flatten[
+                  Position[\(Count[posstbl[\([i, All]\)], #1, 2] &\)\  /@ 
+                      Range[9], 1]], {i, 9}], 1], \[IndentingNewLine]Flatten[
+            Table[\({\(Position[posstbl[\([All, j]\)], #, 2]\)[\([1, 1]\)], 
+                    j, #} &\)\  /@ 
+                Flatten[
+                  Position[\(Count[posstbl[\([All, j]\)], #1, 2] &\)\  /@ 
+                      Range[9], 1]], {j, 9}], 1], \[IndentingNewLine]Flatten[
+            Table[\[IndentingNewLine]\(Join[\(Position[
+                          Table[posstbl[\([i, j]\)], {i, 3\ k - 2, 3  k}, {j, 
+                              3  l - 2, 3  l}], #1, 
+                          3]\)[\([1, {1, 2}]\)] + {3  k - 3, 
+                        3  l - 3}, {#1}] &\)\  /@ \ 
+                Flatten[
+                  Position[\(Count[
+                          Table[posstbl[\([i, j]\)], {i, 3\ k - 2, 3  k}, {j, 
+                              3  l - 2, 3  l}], #, 3] &\)\  /@ \ Range[9], 
+                    1]], \[IndentingNewLine]{k, 3}, {l, 3}], 2]]]\)], "Input"],
+
+Cell[BoxData[
+    \(IterationB[matrix_] := 
+      Module[{newentries, matrixtmp}, \[IndentingNewLine]newentries = 
+          NewEntriesB[matrix]; \[IndentingNewLine]matrixtmp = 
+          ZeroMatrix[9]; \[IndentingNewLine]Do[
+          matrixtmp = 
+            ReplacePart[matrixtmp, 
+              p, \(Select[
+                  newentries, #[\([3]\)] \[Equal] p\  &]\)[\([All, {1, 
+                    2}]\)]], {p, 
+            9}]; \[IndentingNewLine]matrixtmp]\)], "Input"],
+
+Cell["\<\
+StrategyB repeatedly applies function IterationB to matrix until \
+the obtained matrix does not change anymore.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(StrategyB[matrix_] := 
+      Module[{iteratedmatrix}, \[IndentingNewLine]If[
+          iteratedmatrix = IterationB[matrix]; 
+          iteratedmatrix \[Equal] 
+            matrix, \[IndentingNewLine]iteratedmatrix, \
+\[IndentingNewLine]StrategyB[iteratedmatrix]]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Strategy C", "Subsubsection"],
+
+Cell[TextData[{
+  "PossibleTableC[] tries all possible numbers at position ",
+  Cell[BoxData[
+      \(TraditionalForm\`matrix\_ij\)]],
+  "and gives a new possmatrix."
+}], "Text"],
+
+Cell[BoxData[
+    \(PossibleTableC[matrix_, i_, j_] := 
+      Module[{possmatrix}, \[IndentingNewLine]possmatrix = 
+          Select[\(PossibleTable[
+                  StrategyB[
+                    ReplacePart[matrix, #, {i, j}]]] &\)\  /@ \(PossibleTable[
+                  matrix]\)[\([i, j]\)], 
+            NonzeroPossQ[#] &]; \[IndentingNewLine]Table[
+          Apply[Union, possmatrix[\([All, k, l]\)]], {k, 9}, {l, 
+            9}]]\)], "Input"],
+
+Cell["\<\
+BrutePossibleTableC[] tries all possible numbers in every empty \
+entry of matrix, but only one entry at a time.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(BrutePossibleTableC[matrix_] := 
+      Module[{possmatrix}, \[IndentingNewLine]possmatrix = 
+          Flatten[Table[PossibleTableC[matrix, i, j], {i, 9}, {j, 9}], 
+            1]; \[IndentingNewLine]Table[
+          Apply[Intersection, possmatrix[\([All, k, l]\)]], {k, 9}, {l, 
+            9}]]\)], "Input"],
+
+Cell[BoxData[
+    \(IterationC[matrix_] := 
+      Module[{possmatrix}, \[IndentingNewLine]possmatrix = 
+          BrutePossibleTableC[matrix]; \[IndentingNewLine]Table[
+          If[Length[possmatrix[\([i, j]\)]] \[Equal] 1, 
+            possmatrix[\([i, j, 1]\)], 0], {i, 9}, {j, 9}]]\)], "Input"],
+
+Cell["\<\
+StrategyC repeatedly applies function IterationC to matrix until \
+the obtained matrix does not change anymore.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(StrategyC[matrix_] := 
+      If[iteratedmatrix = IterationC[matrix]; iteratedmatrix \[Equal] matrix, 
+        iteratedmatrix, StrategyC[iteratedmatrix]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Solve puzzle", "Subsubsection"],
+
+Cell["\<\
+SolveMatrix[] attempts to solve the given matrix using StrategyA[], \
+StrategyB[] and StrategyC[] and returns the (partly or completely) solved \
+matrix.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(SolveMatrix[matrix_] := 
+      Module[{solA, solB, solC}, \[IndentingNewLine]If[
+          solA = StrategyA[matrix]; 
+          SolvedQ[solA], \[IndentingNewLine]solA, \[IndentingNewLine]If[
+            solB = StrategyB[solA]; 
+            SolvedQ[solB], \[IndentingNewLine]solB, \[IndentingNewLine]If[
+              solC = StrategyC[solB]; 
+              SolvedQ[solC], \[IndentingNewLine]solC, \
+\[IndentingNewLine]Print["\<No solution yet: \>" <> 
+                  ToString[EmptyNumber[solC]] <> "\< empty entries left\>"]; 
+              solC]]]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Test solution", "Subsubsection"],
+
+Cell["SolvedQ[] determines if matrix is a correct solution.", "Text"],
+
+Cell[BoxData[
+    \(SolvedQ[matrix_] := 
+      First[Union[
+          Flatten[{\(Union[matrix[\([#1, All]\)]] \[Equal] Range[9] &\)\  /@ 
+                Range[9], \(Union[matrix[\([All, #1]\)]] \[Equal] 
+                    Range[9] &\)\  /@ Range[9], 
+              Table[Sort[
+                    Flatten[
+                      matrix[\([Range[3\ k - 2, 3\ k], 
+                          Range[3\ l - 2, 3\ l]]\)]]] \[Equal] Range[9], {k, 
+                  3}, {l, 3}]}]]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Import and export", "Subsubsection"],
+
+Cell[BoxData[{
+    \(ImportProblem[name_] := 
+      Import[name <> "\<.prb\>", "\<Table\>"]\), "\[IndentingNewLine]", 
+    \(ImportSolution[name_] := 
+      Import[name <> "\<.sol\>", "\<Table\>"]\), "\[IndentingNewLine]", 
+    \(ExportProblem[name_, matrix_] := 
+      Export[name <> "\<.prb\>", 
+        matrix, "\<Table\>"]\), "\[IndentingNewLine]", 
+    \(ExportSolution[name_, matrix_] := 
+      Export[name <> "\<.sol\>", matrix, "\<Table\>"]\)}], "Input"],
+
+Cell[BoxData[
+    \(ImportSolveExport[name_] := 
+      ExportSolution[name, SolveMatrix[ImportProblem[name]]]\)], "Input"],
+
+Cell[BoxData[
+    \(ImportSolveExportAll[] := 
+      Module[{inputfiles}, \[IndentingNewLine]inputfiles = 
+          Select[FileNames[], 
+            StringTake[#, \(-4\)] == "\<.prb\>" &]; \
+\[IndentingNewLine]\(ExportSolution[StringDrop[#, \(-4\)], 
+              SolveMatrix[ImportProblem[StringDrop[#, \(-4\)]]]] &\)\  /@ \ 
+          inputfiles]\)], "Input"]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Solve puzzles", "Section"],
+
+Cell[BoxData[
+    \(ImportSolveExport["\<Sudoku38_094\>"] // Timing\)], "Input"],
+
+Cell[BoxData[{
+    \(\(problem1 = ImportProblem["\<easy\>"];\)\), "\[IndentingNewLine]", 
+    \(\(solution1 = SolveMatrix[problem1];\)\), "\[IndentingNewLine]", 
+    \(solution1 // MatrixForm\)}], "Input"],
+
+Cell[BoxData[
+    \(ImportSolveExportAll[] // Timing\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 696}},
+WindowSize->{928, 682},
+WindowMargins->{{4, Automatic}, {Automatic, 1}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{
+  "S5.51.1"->{
+    Cell[2053, 69, 76, 1, 27, "Input",
+      CellTags->"S5.51.1"]}
+  }
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{
+  {"S5.51.1", 12874, 389}
+  }
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 30, 0, 88, "Title"],
+Cell[1809, 55, 79, 3, 82, "Subtitle"],
+Cell[1891, 60, 101, 3, 46, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[2017, 67, 33, 0, 69, "Section"],
+Cell[2053, 69, 76, 1, 27, "Input",
+  CellTags->"S5.51.1"],
+Cell[2132, 72, 120, 2, 27, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2289, 79, 35, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[2349, 83, 42, 0, 28, "Subsubsection"],
+Cell[2394, 85, 91, 3, 30, "Text"],
+Cell[2488, 90, 111, 2, 27, "Input"],
+Cell[2602, 94, 210, 5, 30, "Text"],
+Cell[2815, 101, 497, 10, 91, "Input"],
+Cell[3315, 113, 273, 8, 32, "Text"],
+Cell[3591, 123, 115, 2, 27, "Input"],
+Cell[3709, 127, 163, 4, 30, "Text"],
+Cell[3875, 133, 154, 3, 27, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[4066, 141, 35, 0, 22, "Subsubsection"],
+Cell[4104, 143, 139, 3, 30, "Text"],
+Cell[4246, 148, 318, 6, 91, "Input"],
+Cell[4567, 156, 135, 3, 30, "Text"],
+Cell[4705, 161, 296, 6, 75, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[5038, 172, 35, 0, 22, "Subsubsection"],
+Cell[5076, 174, 124, 3, 30, "Text"],
+Cell[5203, 179, 1381, 24, 219, "Input"],
+Cell[6587, 205, 477, 10, 91, "Input"],
+Cell[7067, 217, 135, 3, 30, "Text"],
+Cell[7205, 222, 296, 6, 75, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[7538, 233, 35, 0, 22, "Subsubsection"],
+Cell[7576, 235, 178, 5, 30, "Text"],
+Cell[7757, 242, 453, 9, 75, "Input"],
+Cell[8213, 253, 136, 3, 30, "Text"],
+Cell[8352, 258, 329, 6, 59, "Input"],
+Cell[8684, 266, 298, 5, 59, "Input"],
+Cell[8985, 273, 135, 3, 30, "Text"],
+Cell[9123, 278, 185, 3, 43, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[9345, 286, 37, 0, 22, "Subsubsection"],
+Cell[9385, 288, 177, 4, 30, "Text"],
+Cell[9565, 294, 584, 11, 139, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[10186, 310, 38, 0, 22, "Subsubsection"],
+Cell[10227, 312, 69, 0, 30, "Text"],
+Cell[10299, 314, 489, 10, 91, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[10825, 329, 42, 0, 22, "Subsubsection"],
+Cell[10870, 331, 462, 9, 75, "Input"],
+Cell[11335, 342, 122, 2, 27, "Input"],
+Cell[11460, 346, 363, 7, 59, "Input"]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[11872, 359, 32, 0, 39, "Section"],
+Cell[11907, 361, 80, 1, 27, "Input"],
+Cell[11990, 364, 205, 3, 59, "Input"],
+Cell[12198, 369, 65, 1, 27, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

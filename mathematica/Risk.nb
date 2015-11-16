@@ -1,0 +1,466 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     13088,        361]*)
+(*NotebookOutlinePosition[     13838,        389]*)
+(*  CellTagsIndexPosition[     13765,        383]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Game of Risk", "Title"],
+
+Cell["Brute force probability calculator", "Subtitle"],
+
+Cell["Dennis van den Berg", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Description", "Section"],
+
+Cell["\<\
+This notebook calculates the probabilities of winning/loosing for \
+throwing dice in the game of Risk, depending on the number of dice thrown. \
+Our assumption is that both players throw their dice simultaneously, \
+preventing a player to see what his opponent has thrown and adapting his \
+throwing strategy on this extra information.\
+\>", "Text"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Initialisation", "Section"],
+
+Cell["<<Statistics`DataManipulation`", "Input",
+  CellTags->"S5.98.1"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(ThrowDie[] := Random[Integer, {1, 6}]\), "\n", 
+    \(ThrowDice[d_] := Table[ThrowDie[], {i, d}]\)}], "Input"],
+
+Cell[BoxData[
+    RowBox[{\(General::"spell1"\), \(\(:\)\(\ \)\), "\<\"Possible spelling \
+error: new symbol name \\\"\\!\\(ThrowDice\\)\\\" is similar to existing \
+symbol \\\"\\!\\(ThrowDie\\)\\\". \\!\\(\\*ButtonBox[\\\"More\[Ellipsis]\\\", \
+ButtonStyle->\\\"RefGuideLinkText\\\", ButtonFrame->None, \
+ButtonData:>\\\"General::spell1\\\"]\\)\"\>"}]], "Message"]
+}, Open  ]],
+
+Cell[BoxData[
+    \(CompareDice[d1_, d2_] := 
+      Block[{list1, list2}, \[IndentingNewLine]list1 = 
+          Reverse[Sort[ThrowDice[d1]]]; \[IndentingNewLine]list2 = 
+          Reverse[Sort[ThrowDice[d2]]]; \[IndentingNewLine]Apply[Plus, 
+          Table[If[
+              list1[\([i]\)] > list2[\([i]\)], {0, \(-1\)}, {\(-1\), 0}], {i, 
+              Min[d1, d2]}]]]\)], "Input"],
+
+Cell[BoxData[
+    \(Probabilities[d1_, d2_, n_] := 
+      Block[{freqs}, \[IndentingNewLine]freqs = 
+          Frequencies[
+            Table[CompareDice[d1, d2], {i, 
+                n}]]; \[IndentingNewLine]Map[{#[\([1]\)]/n, #[\([2]\)]} &, 
+          freqs]]\)], "Input"],
+
+Cell[BoxData[
+    \(AverageScores[d1_, d2_, n_] := 
+      Block[{probs}, \[IndentingNewLine]probs = 
+          Probabilities[d1, d2, n]; \[IndentingNewLine]Apply[Plus, 
+          Map[#[\([1]\)] #[\([2]\)] &\ , probs]]]\)], "Input"],
+
+Cell[BoxData[{
+    \(AverageRatios[d1_, d2_, n_] := 
+      Block[{}, \[IndentingNewLine]scores = 
+          AverageScores[d1, d2, n]; \[IndentingNewLine]scores[\([2]\)]/
+          scores[\([1]\)]]\), "\[IndentingNewLine]", 
+    \( (*\ 
+      Higher\ ratio\ means\ higher\ winning\ ratio\ for\ attacker\ \((player\ \
+1)\)\ *) \)}], "Input"],
+
+Cell[BoxData[
+    \(WinnerMax[armies1_, armies2_] := 
+      Block[{a1, a2}, \[IndentingNewLine]a1 = 
+          armies1; \[IndentingNewLine]a2 = armies2; \[IndentingNewLine]While[
+          Min[a1 - 1, a2] > 
+            0, {a1, a2} = {a1, a2} + 
+              CompareDice[Min[a1 - 1, 3], Min[a2, 2]]]; \[IndentingNewLine]If[
+          a2 == 0, 1, 2]]\)], "Input"],
+
+Cell[BoxData[
+    \(WinProbabilitiesMax[armies1_, armies2_, n_] := 
+      Block[{freqs}, \[IndentingNewLine]freqs = 
+          Frequencies[
+            Table[WinnerMax[armies1, armies2], {i, n}]]; \[IndentingNewLine]N[
+          If[freqs[\([1, 2]\)] \[Equal] 1, freqs[\([1, 1]\)]/n, 
+            1 - freqs[\([1, 1]\)]/n]]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Calculations", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Probability matrices", "Subsection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(\(winratios = 
+        Table[N[AverageRatios[d1, d2, 20000]], {d1, 3}, {d2, 
+            2}];\)\), "\[IndentingNewLine]", 
+    \(winratios // MatrixForm\), "\n", 
+    \(\(scores = 
+        Table[N[AverageScores[d1, d2, 20000]], {d1, 3}, {d2, 
+            2}];\)\), "\[IndentingNewLine]", 
+    \(scores // MatrixForm\)}], "Input"],
+
+Cell[BoxData[
+    TagBox[
+      RowBox[{"(", "\[NoBreak]", GridBox[{
+            {"0.7287578874578615`", "0.33707714935151756`"},
+            {"1.3654642223536368`", "0.6509141937347807`"},
+            {"1.9748624126134167`", "1.1771077124040712`"}
+            },
+          RowSpacings->1,
+          ColumnSpacings->1,
+          ColumnAlignments->{Left}], "\[NoBreak]", ")"}],
+      Function[ BoxForm`e$, 
+        MatrixForm[ BoxForm`e$]]]], "Output"],
+
+Cell[BoxData[
+    TagBox[
+      RowBox[{"(", "\[NoBreak]", GridBox[{
+            {
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(-0.5825`\)},
+                      {\(-0.4175`\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}], 
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(-0.74365`\)},
+                      {\(-0.25635`\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}]},
+            {
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(-0.41785`\)},
+                      {\(-0.58215`\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}], 
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(-1.21935`\)},
+                      {\(-0.78065`\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}]},
+            {
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(-0.33095`\)},
+                      {\(-0.66905`\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}], 
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(-0.92865`\)},
+                      {\(-1.07135`\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}]}
+            },
+          RowSpacings->1,
+          ColumnSpacings->1,
+          ColumnAlignments->{Left}], "\[NoBreak]", ")"}],
+      Function[ BoxForm`e$, 
+        MatrixForm[ BoxForm`e$]]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(\(lownumbers = 
+        Table[WinProbabilitiesMax[armies1, armies2, 10000], {armies1, 
+            5}, {armies2, 10}];\)\), "\n", 
+    \(lownumbers // MatrixForm\)}], "Input"],
+
+Cell[BoxData[
+    TagBox[
+      RowBox[{"(", "\[NoBreak]", GridBox[{
+            {"0.`", "0.`", "0.`", "0.`", "0.`", "0.`", "0.`", "0.`", "0.`", 
+              "0.`"},
+            {"0.4164`", "0.1055`", "0.0279`", "0.0068`", "0.0025`", "0.0003`",
+               "0.`", "0.`", "0.`", "0.`"},
+            {"0.7508`", "0.3584`", "0.2049`", "0.0919`", "0.0485`", "0.0234`",
+               "0.0126`", "0.0049`", "0.0019`", "0.0007`"},
+            {"0.9181`", "0.6516`", "0.4715`", "0.3138`", "0.2099`", "0.1278`",
+               "0.0815`", "0.0545`", "0.0327`", "0.0214`"},
+            {"0.9701`", "0.782`", "0.6346`", "0.4712`", "0.36`", "0.2504`", 
+              "0.1879`", "0.1224`", "0.0865`", "0.0591`"}
+            },
+          RowSpacings->1,
+          ColumnSpacings->1,
+          ColumnAlignments->{Left}], "\[NoBreak]", ")"}],
+      Function[ BoxForm`e$, 
+        MatrixForm[ BoxForm`e$]]]], "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Conclusions", "Section"],
+
+Cell["\<\
+-\tAttacker can minimize relative loss by choosing as many dice as \
+possible.
+-\tDefender can minimize relative loss by choosing as many dice as possible.
+-\tAttacking is (relatively) advantageous if attacker has at least one more \
+die than defender.\
+\>", "Text"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["New", "Section"],
+
+Cell[BoxData[
+    \(WinProbabilitiesMaxEstimate[armies1_, armies2_] := 
+      If[armies1 \[LessEqual] 5\  && \ 
+          armies2 \[LessEqual] 10, \[IndentingNewLine]lownumbers[\([armies1, 
+            armies2]\)], \[IndentingNewLine]Block[{ (*armies2est*) }, \
+\[IndentingNewLine]armies2est = 
+            armies2 - \((armies1 - 5)\) 
+                winratios[\([3, 2]\)]; \[IndentingNewLine]If[
+            armies2est < 1\  || \ 
+              armies2est > 
+                10\ , \[IndentingNewLine]Indeterminate, \
+\[IndentingNewLine]Block[{ (*flr, ceil*) }, \[IndentingNewLine]flr = 
+                Floor[armies2est]; \[IndentingNewLine]ceil = 
+                Ceiling[
+                  armies2est]; \[IndentingNewLine]\((ceil - armies2est)\) 
+                  lownumbers[\([5, flr]\)] + \((armies2est - flr)\) 
+                  lownumbers[\([5, ceil]\)]]]]]\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(Table[
+        WinProbabilitiesMaxEstimate[armies1, armies2], {armies1, 
+          10}, {armies2, 10}] // MatrixForm\)], "Input"],
+
+Cell[BoxData[
+    TagBox[
+      RowBox[{"(", "\[NoBreak]", GridBox[{
+            {"0.`", "0.`", "0.`", "0.`", "0.`", "0.`", "0.`", "0.`", "0.`", 
+              "0.`"},
+            {"0.4164`", "0.1055`", "0.0279`", "0.0068`", "0.0025`", "0.0003`",
+               "0.`", "0.`", "0.`", "0.`"},
+            {"0.7508`", "0.3584`", "0.2049`", "0.0919`", "0.0485`", "0.0234`",
+               "0.0126`", "0.0049`", "0.0019`", "0.0007`"},
+            {"0.9181`", "0.6516`", "0.4715`", "0.3138`", "0.2099`", "0.1278`",
+               "0.0815`", "0.0545`", "0.0327`", "0.0214`"},
+            {"0.9701`", "0.782`", "0.6346`", "0.4712`", "0.36`", "0.2504`", 
+              "0.1879`", "0.1224`", "0.0865`", "0.0591`"},
+            {"Indeterminate", "Indeterminate", "0.8153139607032058`", 
+              "0.6607056768083602`", "0.5001394002068252`", 
+              "0.3796943776193327`", "0.2698110052794862`", 
+              "0.19896923202525446`", "0.13400055516246667`", 
+              "0.09285816687530615`"},
+            {"Indeterminate", "Indeterminate", "Indeterminate", 
+              "0.8486279214064116`", "0.6868113536167202`", 
+              "0.5290788004136505`", "0.39938875523866546`", 
+              "0.2892220105589724`", "0.2100384640505089`", 
+              "0.14560111032493334`"},
+            {"Indeterminate", "Indeterminate", "Indeterminate", 
+              "Indeterminate", "0.8819418821096173`", "0.7129170304250803`", 
+              "0.5580182006204757`", "0.41908313285799814`", 
+              "0.3086330158384586`", "0.22110769607576336`"},
+            {"Indeterminate", "Indeterminate", "Indeterminate", 
+              "Indeterminate", "Indeterminate", "0.9152558428128231`", 
+              "0.7390227072334404`", "0.586957600827301`", 
+              "0.4387775104773309`", "0.32804402111794484`"},
+            {"Indeterminate", "Indeterminate", "Indeterminate", 
+              "Indeterminate", "Indeterminate", "Indeterminate", 
+              "0.9485698035160289`", "0.7651283840418005`", 
+              "0.6158970010341261`", "0.4584718880966636`"}
+            },
+          RowSpacings->1,
+          ColumnSpacings->1,
+          ColumnAlignments->{Left}], "\[NoBreak]", ")"}],
+      Function[ BoxForm`e$, 
+        MatrixForm[ BoxForm`e$]]]], "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 691}},
+WindowSize->{1016, 662},
+WindowMargins->{{4, Automatic}, {Automatic, 1}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{
+  "S5.98.1"->{
+    Cell[2397, 76, 70, 1, 27, "Input",
+      CellTags->"S5.98.1"]}
+  }
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{
+  {"S5.98.1", 13672, 376}
+  }
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 29, 0, 88, "Title"],
+Cell[1808, 55, 54, 0, 52, "Subtitle"],
+Cell[1865, 57, 42, 0, 28, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1932, 61, 30, 0, 69, "Section"],
+Cell[1965, 63, 359, 6, 46, "Text"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[2361, 74, 33, 0, 69, "Section"],
+Cell[2397, 76, 70, 1, 27, "Input",
+  CellTags->"S5.98.1"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2504, 82, 35, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[2564, 86, 131, 2, 43, "Input"],
+Cell[2698, 90, 365, 5, 21, "Message"]
+}, Open  ]],
+Cell[3078, 98, 383, 7, 75, "Input"],
+Cell[3464, 107, 274, 6, 59, "Input"],
+Cell[3741, 115, 231, 4, 59, "Input"],
+Cell[3975, 121, 339, 7, 75, "Input"],
+Cell[4317, 130, 363, 7, 91, "Input"],
+Cell[4683, 139, 335, 6, 59, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[5055, 150, 31, 0, 69, "Section"],
+
+Cell[CellGroupData[{
+Cell[5111, 154, 42, 0, 38, "Subsection"],
+
+Cell[CellGroupData[{
+Cell[5178, 158, 350, 8, 75, "Input"],
+Cell[5531, 168, 451, 11, 69, "Output"],
+Cell[5985, 181, 2164, 59, 117, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[8186, 245, 196, 4, 43, "Input"],
+Cell[8385, 251, 906, 18, 101, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[9352, 276, 30, 0, 69, "Section"],
+Cell[9385, 278, 276, 6, 62, "Text"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[9698, 289, 22, 0, 69, "Section"],
+Cell[9723, 291, 880, 16, 171, "Input"],
+
+Cell[CellGroupData[{
+Cell[10628, 311, 149, 3, 27, "Input"],
+Cell[10780, 316, 2268, 40, 181, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

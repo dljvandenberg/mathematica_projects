@@ -1,0 +1,274 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      8157,        205]*)
+(*NotebookOutlinePosition[      8792,        227]*)
+(*  CellTagsIndexPosition[      8748,        223]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Shortest Path Problem", "Title"],
+
+Cell[TextData[{
+  "Solved by Dynamic Programming Algorithm (order ",
+  Cell[BoxData[
+      \(TraditionalForm\`\(\(\[PrecedesTilde]\)\(n\^3\)\)\)]],
+  ")"
+}], "Subtitle"],
+
+Cell["\<\
+2006/10/09
+Dennis van den Berg
+DLJvandenBerg@gmail.com\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["General", "Subsection"],
+
+Cell[BoxData[
+    \(DiscreteMinArg[f_Function, argspace_List] := 
+      Module[{fxlist, min, n, argmin}, \[IndentingNewLine]fxlist = 
+          Map[{f[#], #} &, argspace]; \[IndentingNewLine]min = 
+          Min[fxlist[\([All, 1]\)]]; \[IndentingNewLine]n = 
+          Length[argspace]; \[IndentingNewLine]For[\[IndentingNewLine]argmin \
+= Null; i = 1, \[IndentingNewLine]i \[LessEqual] 
+            n, \[IndentingNewLine]\(i++\), \[IndentingNewLine]If[
+            fxlist[\([i, 1]\)] \[Equal] min, \[IndentingNewLine]argmin = 
+              fxlist[\([i, 
+                  2]\)]\[IndentingNewLine]]\[IndentingNewLine]]; \
+\[IndentingNewLine]{min, argmin}\[IndentingNewLine]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Generate tables for distances", "Subsection"],
+
+Cell[BoxData[
+    \(RandomDirectedGraph[n_Integer, pconnected_, maxdistance_] := 
+      Table[\[IndentingNewLine]If[
+          i \[Equal] j, \[IndentingNewLine]0, \[IndentingNewLine]If[
+            Random[] < pconnected, \[IndentingNewLine]Random[
+              Real, {0, 
+                maxdistance}], \[IndentingNewLine]Infinity]], \
+\[IndentingNewLine]{i, 1, n}, \[IndentingNewLine]{j, 1, n}]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Shortest path", "Subsection"],
+
+Cell[BoxData[
+    \(ShortestPaths[a_?MatrixQ, t_Integer] := 
+      Module[{n, Jlist, mulist, k, Jmulistnew}, \[IndentingNewLine]n = 
+          Length[a]; \[IndentingNewLine]For[\[IndentingNewLine]Jlist = 
+            a[\([\)\(All, t\)\(]\)]; \[IndentingNewLine]mulist = 
+            Table[{t}, {n}]; \[IndentingNewLine]k = 
+            n - 1, \[IndentingNewLine]k \[GreaterEqual] 
+            1, \[IndentingNewLine]\(k--\), \[IndentingNewLine]Jmulistnew = 
+            Table[\[IndentingNewLine]DiscreteMinArg[\[IndentingNewLine]a[\([\)\
+\(x, #\)\(]\)] + Jlist[\([\)\(#\)\(]\)] &, \[IndentingNewLine]Range[
+                  n]], \[IndentingNewLine]{x, 1, 
+                n}]; \[IndentingNewLine]If[\[IndentingNewLine]Jlist \[Equal] 
+              Jmulistnew[\([\)\(All, 1\)\(]\)], \[IndentingNewLine]k = 
+              0, \[IndentingNewLine]Jlist = 
+              Jmulistnew[\([\)\(All, 1\)\(]\)]; \[IndentingNewLine]mulist = 
+              Table[\[IndentingNewLine]If[
+                  mulist[\([\)\(i, 1\)\(]\)] \[NotEqual] 
+                    Jmulistnew[\([\)\(i, 
+                      2\)\(]\)], \[IndentingNewLine]Prepend[
+                    mulist[\([Jmulistnew[\([\)\(i, 2\)\(]\)]]\)], 
+                    Jmulistnew[\([\)\(i, 
+                      2\)\(]\)]], \[IndentingNewLine]mulist[\([Jmulistnew[\([\
+\)\(i, 2\)\(]\)]]\)]], \[IndentingNewLine]{i, 1, 
+                  n}]]]; \[IndentingNewLine]Table[\[IndentingNewLine]If[
+            Jlist[\([\)\(i\)\(]\)] \[Equal] Infinity, \[IndentingNewLine]{i, 
+              Null}, \[IndentingNewLine]If[
+              mulist[\([\)\(i, 1\)\(]\)] \[NotEqual] 
+                i, \[IndentingNewLine]Prepend[mulist[\([\)\(i\)\(]\)], 
+                i], \[IndentingNewLine]mulist[\([\)\(i\)\(]\)]]], \
+\[IndentingNewLine]{i, 1, n}]]\)], "Input"],
+
+Cell[BoxData[
+    \(ShortestPath[a_?MatrixQ, s_Integer, 
+        t_Integer] := \(ShortestPaths[a, t]\)[\([s]\)]\)], "Input"]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Calculations", "Section"],
+
+Cell[BoxData[
+    \(\(dtable = RandomDirectedGraph[30,  .1, 1];\)\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(ShortestPaths[dtable, 1] // TableForm\)], "Input"],
+
+Cell[BoxData[
+    InterpretationBox[GridBox[{
+          {"1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"2", "7", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"3", "12", "12", "2", "7", "1"},
+          {"4", "10", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"5", "12", "12", "2", "7", "1"},
+          {"6", "27", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"7", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"8", "29", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"9", "23", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"10", "7", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"11", "25", "25", "23", "7", "1"},
+          {"12", "2", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"13", "23", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"14", "23", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"15", "8", "29", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"16", "15", "8", "29", "1", "\<\"\"\>"},
+          {"17", "23", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"18", "2", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"19", "6", "27", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"20", "7", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"21", "23", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"22", "12", "2", "7", "1", "\<\"\"\>"},
+          {"23", "7", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"24", "23", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"25", "23", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"26", "28", "7", "1", "\<\"\"\>", "\<\"\"\>"},
+          {"27", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"28", "7", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"29", "1", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>", "\<\"\"\>"},
+          {"30", "2", "7", "1", "\<\"\"\>", "\<\"\"\>"}
+          },
+        RowSpacings->1,
+        ColumnSpacings->3,
+        RowAlignments->Baseline,
+        ColumnAlignments->{Left}],
+      TableForm[ {{1}, {2, 7, 1}, {3, 12, 12, 2, 7, 1}, {4, 10, 7, 1}, {5, 12,
+         12, 2, 7, 1}, {6, 27, 1}, {7, 1}, {8, 29, 1}, {9, 23, 7, 1}, {10, 7, 
+        1}, {11, 25, 25, 23, 7, 1}, {12, 2, 7, 1}, {13, 23, 7, 1}, {14, 23, 7,
+         1}, {15, 8, 29, 1}, {16, 15, 8, 29, 1}, {17, 23, 7, 1}, {18, 2, 7, 
+        1}, {19, 6, 27, 1}, {20, 7, 1}, {21, 23, 7, 1}, {22, 12, 2, 7, 1}, {
+        23, 7, 1}, {24, 23, 7, 1}, {25, 23, 7, 1}, {26, 28, 7, 1}, {27, 1}, {
+        28, 7, 1}, {29, 1}, {30, 2, 7, 1}}]]], "Output"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{931, 723},
+WindowMargins->{{1, Automatic}, {Automatic, 0}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 38, 0, 88, "Title"],
+Cell[1817, 55, 169, 5, 53, "Subtitle"],
+Cell[1989, 62, 85, 4, 64, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[2099, 70, 28, 0, 69, "Section"],
+
+Cell[CellGroupData[{
+Cell[2152, 74, 29, 0, 38, "Subsection"],
+Cell[2184, 76, 688, 11, 235, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2909, 92, 51, 0, 30, "Subsection"],
+Cell[2963, 94, 409, 7, 139, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3409, 106, 35, 0, 30, "Subsection"],
+Cell[3447, 108, 1802, 29, 475, "Input"],
+Cell[5252, 139, 124, 2, 27, "Input"]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[5425, 147, 31, 0, 39, "Section"],
+Cell[5459, 149, 78, 1, 27, "Input"],
+
+Cell[CellGroupData[{
+Cell[5562, 154, 70, 1, 27, "Input"],
+Cell[5635, 157, 2482, 43, 501, "Output"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

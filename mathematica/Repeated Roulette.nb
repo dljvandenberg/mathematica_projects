@@ -1,0 +1,274 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      7111,        203]*)
+(*NotebookOutlinePosition[      7746,        225]*)
+(*  CellTagsIndexPosition[      7702,        221]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Repeated Roulette Gambling", "Title"],
+
+Cell["Keep increasing bet until winning or reaching limit", "Subtitle"],
+
+Cell["\<\
+Dennis van den Berg
+DLJvandenBerg@gmail.com\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell[BoxData[
+    \(CumulativeAmountLose[round_Integer, start_:  10, factor_:  2.5] := 
+      Sum[\(-start\)\ factor^\((i - 1)\), {i, 1, round}]\)], "Input"],
+
+Cell[BoxData[
+    \(CumulativeAmountWin[round_Integer, start_:  10, factor_:  2.5] := 
+      CumulativeAmountLose[round - 1, start, factor] + 
+        start\ factor^\((round - 1)\)\)], "Input"],
+
+Cell[BoxData[
+    \(ProbabilityLose[round_Integer, winprob_:  16/33] := \((1 - winprob)\)^
+        round\)], "Input"],
+
+Cell[BoxData[
+    \(ProbabilityWin[round_Integer, winprob_:  16/33] := 
+      ProbabilityLose[round - 1, winprob]\ winprob\)], "Input"],
+
+Cell[BoxData[
+    \(AmountProbabilities[start_:  10, factor_:  2.5, limit_:  3000000, 
+        winprob_:  16/33] := 
+      Module[{amountprobtable, round, cumulativelosenext, cumulativewin, 
+          cumulativelose, probwin, 
+          problose}, \[IndentingNewLine]amountprobtable = {}; \
+\[IndentingNewLine]For[round = 1; 
+          cumulativelosenext = 
+            CumulativeAmountLose[1, start, 
+              factor], \[IndentingNewLine]\(-cumulativelosenext\) \
+\[LessEqual] 
+            limit, \[IndentingNewLine]\(round++\), \
+\[IndentingNewLine]cumulativewin = 
+            CumulativeAmountWin[round, start, 
+              factor]; \[IndentingNewLine]cumulativelosenext = 
+            CumulativeAmountLose[round + 1, start, 
+              factor]; \[IndentingNewLine]probwin = 
+            ProbabilityWin[round, 
+              winprob]; \[IndentingNewLine]amountprobtable = 
+            Append[amountprobtable, {cumulativewin, 
+                probwin}]]; \[IndentingNewLine]cumulativelose = 
+          CumulativeAmountLose[round - 1, start, 
+            factor]; \[IndentingNewLine]problose = 
+          ProbabilityLose[round - 1, 
+            winprob]; \[IndentingNewLine]amountprobtable = 
+          Append[amountprobtable, {cumulativelose, 
+              problose}]; \[IndentingNewLine]N[amountprobtable]]\)], "Input"],
+
+Cell[BoxData[
+    \(SortedAmountProbabilities[start_:  10, factor_:  2.5, limit_:  3000000, 
+        winprob_:  16/33] := 
+      Module[{amountprobs, stopround, 
+          newamountprobs}, \[IndentingNewLine]amountprobs = 
+          AmountProbabilities[start, factor, limit, 
+            winprob]; \[IndentingNewLine]stopround = 
+          Length[amountprobs]; \[IndentingNewLine]newamountprobs = 
+          If[factor \[Equal] 
+              2, \[IndentingNewLine]{{amountprobs[\([1, 1]\)], 
+                Sum[amountprobs[\([i, 2]\)], {i, 1, stopround - 1}]}, 
+              amountprobs[\([stopround, {1, 
+                    2}]\)]}, \[IndentingNewLine]amountprobs]; \
+\[IndentingNewLine]Sort[newamountprobs]]\)], "Input"],
+
+Cell[BoxData[
+    \(AverageProfit[start_:  10, factor_:  2.5, limit_:  3000000, 
+        winprob_:  16/33] := 
+      Module[{amountprobs, stopround}, \[IndentingNewLine]amountprobs = 
+          AmountProbabilities[start, factor, limit, 
+            winprob]; \[IndentingNewLine]stopround = 
+          Length[amountprobs]; \[IndentingNewLine]Sum[
+          amountprobs[\([i, 1]\)]\ amountprobs[\([i, 2]\)], {i, 
+            stopround}]]\)], "Input"],
+
+Cell[BoxData[
+    \(MedianProfit[start_:  10, factor_:  2.5, limit_:  3000000, 
+        winprob_:  16/33] := 
+      Module[{amountprobs, nr, cumulativeprob, 
+          medianamount}, \[IndentingNewLine]amountprobs = 
+          SortedAmountProbabilities[start, factor, limit, 
+            winprob]; \[IndentingNewLine]nr = 
+          Length[amountprobs]; \[IndentingNewLine]cumulativeprob = 
+          0; \[IndentingNewLine]For[
+          i = 1, \[IndentingNewLine]i \[LessEqual] 
+            nr, \[IndentingNewLine]\(i++\), \[IndentingNewLine]cumulativeprob \
+= cumulativeprob + amountprobs[\([i, 2]\)]; \[IndentingNewLine]If[
+            cumulativeprob \[GreaterEqual]  .5, \
+\[IndentingNewLine]medianamount = 
+              amountprobs[\([i, 1]\)]; \[IndentingNewLine]i = 
+              nr + 1]]; \[IndentingNewLine]medianamount]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Run game", "Section"],
+
+Cell[BoxData[{
+    \(\(start = 10;\)\), "\[IndentingNewLine]", 
+    \(\(factor = 2;\)\), "\[IndentingNewLine]", 
+    \(\(limit = 100;\)\), "\[IndentingNewLine]", 
+    \(\(winprob = 16/33;\)\)}], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(SortedAmountProbabilities[start, factor, limit, winprob] // 
+      TableForm\)], "Input"],
+
+Cell[BoxData[
+    TagBox[GridBox[{
+          {\(-70.`\), "0.13671146728997968`"},
+          {"10.`", "0.8632885327100203`"}
+          },
+        RowSpacings->1,
+        ColumnSpacings->3,
+        RowAlignments->Baseline,
+        ColumnAlignments->{Left}],
+      Function[ BoxForm`e$, 
+        TableForm[ BoxForm`e$]]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(AverageProfit[start, factor, limit, winprob]\)], "Input"],
+
+Cell[BoxData[
+    \(\(-0.9369173831983755`\)\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(MedianProfit[start, factor, limit, winprob]\)], "Input"],
+
+Cell[BoxData[
+    \(10.`\)], "Output"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 691}},
+WindowSize->{905, 669},
+WindowMargins->{{4, Automatic}, {Automatic, 4}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 43, 0, 88, "Title"],
+Cell[1822, 55, 71, 0, 52, "Subtitle"],
+Cell[1896, 57, 74, 3, 46, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1995, 64, 35, 0, 69, "Section"],
+Cell[2033, 66, 157, 2, 43, "Input"],
+Cell[2193, 70, 193, 3, 43, "Input"],
+Cell[2389, 75, 117, 2, 27, "Input"],
+Cell[2509, 79, 135, 2, 27, "Input"],
+Cell[2647, 83, 1333, 26, 251, "Input"],
+Cell[3983, 111, 725, 13, 155, "Input"],
+Cell[4711, 126, 448, 8, 91, "Input"],
+Cell[5162, 136, 844, 15, 219, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[6043, 156, 27, 0, 39, "Section"],
+Cell[6073, 158, 203, 4, 75, "Input"],
+
+Cell[CellGroupData[{
+Cell[6301, 166, 109, 2, 27, "Input"],
+Cell[6413, 170, 329, 10, 53, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6779, 185, 77, 1, 27, "Input"],
+Cell[6859, 188, 58, 1, 27, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6954, 194, 76, 1, 27, "Input"],
+Cell[7033, 197, 38, 1, 27, "Output"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

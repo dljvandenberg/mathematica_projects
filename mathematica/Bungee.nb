@@ -1,0 +1,357 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      8868,        257]*)
+(*NotebookOutlinePosition[      9524,        280]*)
+(*  CellTagsIndexPosition[      9480,        276]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Bungee Jumping", "Title"],
+
+Cell["The motion of falling in an ideal elastic cord", "Subtitle"],
+
+Cell["\<\
+09/05/2007
+Dennis van den Berg
+DLJvandenBerg@gmail.com\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Notes", "Section"],
+
+Cell["\<\
+-\tThis notebook calculates the motion of an object of mass m, \
+attached to an ideal massless elastic cord of length L and spring constant k, \
+under the influence of a gravitational acceleration g.
+-\tNotations mok, gol and mokgol represent m/k, g/L and mg/kL respectively.\
+\
+\>", "Text"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Physical quantities", "Subsection"],
+
+Cell[CellGroupData[{
+
+Cell["Caracteristic values", "Subsubsection"],
+
+Cell[BoxData[{
+    \(t1[gol_] := \@\(2\/gol\)\), "\n", 
+    \(t2[mok_, gol_] := 
+      t1[gol] + \(\@mok\) ArcCos[\(-1\)\/\@\(1 + 2\/\(mok\ gol\)\)]\), "\n", 
+    \(t3[mok_, gol_] := 2  t2[mok, gol] - t1[gol]\), "\n", 
+    \(t4[mok_, gol_] := 2  t2[mok, gol]\), "\n", 
+    \(f[mokgol_] := 1 + mokgol\), "\n", 
+    \(d[mokgol_] := 1 + mokgol \((1 + \@\(1 + 2\/mokgol\))\)\), "\n", 
+    \(omega[mok_] := \@\(1\/mok\)\), "\n", 
+    \(amaxog[
+        mokgol_] := \@\(1 + 2\/mokgol\)\  (*\(=\)\(\(d - f\)\/\(f - 
+              1\)\)*) \), "\n", 
+    \(acmaxog[
+        mokgol_] := \(\(amaxog[
+          mokgol]\)\(+\)\(1\)\(\ \)\( (*\(=\)\(\(d - 1\)\/\(f - 
+                  1\)\)*) \)\)\)}], "Input"],
+
+Cell[BoxData[
+    \(ImportantValues[mok_, gol_] := 
+      Block[{t1val, t2val, t3val, t4val, fval, dval, omegaval, 
+          amaxogval}, \[IndentingNewLine]t1val = 
+          t1[gol]; \[IndentingNewLine]t2val = 
+          t2[mok, gol]; \[IndentingNewLine]t3val = 
+          t3[mok, gol]; \[IndentingNewLine]t4val = 
+          t4[mok, gol]; \[IndentingNewLine]fval = 
+          f[mok\ gol]; \[IndentingNewLine]dval = 
+          d[mok\ gol]; \[IndentingNewLine]omegaval = 
+          omega[mok]; \[IndentingNewLine]amaxogval = 
+          amaxog[mok\ gol]; \[IndentingNewLine]acmaxogval = 
+          acmaxog[mok\ gol]; \[IndentingNewLine]{t1val, t2val, t3val, t4val, 
+          fval, dval, omegaval, amaxogval, acmaxogval}]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Position", "Subsubsection"],
+
+Cell[BoxData[
+    \(xol[t_, gol_, t1_, t2_, t3_, t4_, f_, d_, omega_] := 
+      Which[\[IndentingNewLine]0 \[LessEqual] t < t1, \(-\(1\/2\)\) 
+          gol\ t\^2, \[IndentingNewLine]t1 \[LessEqual] t < 
+          t3, \(-f\) - \((d - f)\) 
+            Cos[omega \((t - t2)\)], \[IndentingNewLine]t3 \[LessEqual] 
+          t \[LessEqual] t4, \(-\(1\/2\)\) 
+          gol\ \((t - t4)\)\^2, \[IndentingNewLine]True, 0]\)], "Input"],
+
+Cell[BoxData[
+    \(xol2[t_, mok_, gol_] := 
+      Block[{t1val, t2val, t3val, t4val, fval, dval, omegaval, amaxogval, 
+          acmaxogval}, \[IndentingNewLine]{t1val, t2val, t3val, t4val, fval, 
+            dval, omegaval, amaxogval, acmaxogval} = 
+          ImportantValues[mok, gol]; \[IndentingNewLine]xol[t, gol, t1val, 
+          t2val, t3val, t4val, fval, dval, omegaval]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Acceleration", "Subsubsection"],
+
+Cell[BoxData[
+    \(aog[t_, gol_, t1_, t2_, t3_, t4_, f_, d_, omega_] := 
+      Which[\[IndentingNewLine]0 \[LessEqual] t < 
+          t1, \(-1\), \[IndentingNewLine]t1 \[LessEqual] t < 
+          t3, \(\(d - f\)\/\(f - 1\)\) 
+          Cos[omega \((t - t2)\)], \[IndentingNewLine]t3 \[LessEqual] 
+          t \[LessEqual] t4, \(-1\), \[IndentingNewLine]True, 0]\)], "Input"],
+
+Cell[BoxData[
+    \(aog2[t_, mok_, gol_] := 
+      Block[{t1val, t2val, t3val, t4val, fval, dval, omegaval, amaxogval, 
+          acmaxogval}, \[IndentingNewLine]{t1val, t2val, t3val, t4val, fval, 
+            dval, omegaval, amaxogval, acmaxogval} = 
+          ImportantValues[mok, gol]; \[IndentingNewLine]aog[t, gol, t1val, 
+          t2val, t3val, t4val, fval, dval, omegaval]]\)], "Input"],
+
+Cell[BoxData[
+    \(MaxForce[m_, k_, g_, L_] := acmaxog[\(m\ g\)\/\(k\ L\)]\)], "Input"],
+
+Cell[BoxData[
+    \(MinSafetymokgol[maxforce_] := 
+      2\/\(\((maxforce - 1)\)\^2 - 1\)\)], "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Graphs", "Subsection"],
+
+Cell[CellGroupData[{
+
+Cell["Position", "Subsubsection"],
+
+Cell[BoxData[
+    \(Plotx[mok_, gol_] := 
+      Block[{t1val, t2val, t3val, t4val, fval, dval, omegaval, amaxogval, 
+          acmaxogval}, \[IndentingNewLine]{t1val, t2val, t3val, t4val, fval, 
+            dval, omegaval, amaxogval, acmaxogval} = 
+          ImportantValues[mok, gol]; \[IndentingNewLine]Plot[
+          xol[t, gol, t1val, t2val, t3val, t4val, fval, dval, omegaval], {t, 
+            0, t4val}, AxesLabel \[Rule] {"\<t\>", "\<x[t]/L\>"}]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Acceleration", "Subsubsection"],
+
+Cell[BoxData[
+    \(Plota[mok_, gol_] := 
+      Block[{t1val, t2val, t3val, t4val, fval, dval, omegaval, amaxogval, 
+          acmaxogval}, \[IndentingNewLine]{t1val, t2val, t3val, t4val, fval, 
+            dval, omegaval, amaxogval, acmaxogval} = 
+          ImportantValues[mok, gol]; \[IndentingNewLine]Plot[
+          aog[t, gol, t1val, t2val, t3val, t4val, fval, dval, omegaval], {t, 
+            0, t4val}, AxesLabel \[Rule] {"\<t\>", "\<a[t]/g\>"}]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Various", "Subsubsection"],
+
+Cell[BoxData[
+    \(Report[mok_, gol_] := 
+      Block[{t1val, t2val, t3val, t4val, fval, dval, omegaval, amaxogval, 
+          acmaxogval}, \[IndentingNewLine]{t1val, t2val, t3val, t4val, fval, 
+            dval, omegaval, amaxogval, acmaxogval} = 
+          ImportantValues[mok, 
+            gol]; \[IndentingNewLine]Print["\<Input parameters:      m/k = \
+\>" <> ToString[N[mok]] <> "\< ; g/L = \>" <> 
+            ToString[
+              N[gol]]]; \[IndentingNewLine]Print["\<'Switch' times:        t1 \
+= \>" <> ToString[N[t1val]] <> "\< ; t2 = \>" <> 
+            ToString[N[t2val]] <> "\< ; t3 = \>" <> 
+            ToString[N[t3val]] <> "\< ; t4 = \>" <> 
+            ToString[
+              N[t4val]]]; \[IndentingNewLine]Print["\<Special x/L points:    \
+f = \>" <> ToString[N[fval]] <> "\< ; d = \>" <> 
+            ToString[
+              N[dval]]]; \[IndentingNewLine]Print["\<Angular freq. of cord: \
+omega = \>" <> ToString[
+                N[omegaval]]]\[IndentingNewLine]Print["\<Max. acceleration:   \
+  amax/g = \>" <> ToString[N[amaxogval]] <> "\< ; acmax/g = \>" <> 
+              ToString[
+                N[acmaxogval]] <> "\< (max 'force' on body)\>"]; \
+\[IndentingNewLine]{Plotx[mok, gol], Plota[mok, gol]}]\)], "Input"]
+}, Open  ]]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Calculations", "Section"],
+
+Cell[BoxData[{
+    \(\(m = 60;\)\), "\[IndentingNewLine]", 
+    \(\(k = 100;\)\), "\[IndentingNewLine]", 
+    \(\(g = 9.81;\)\), "\[IndentingNewLine]", 
+    \(\(L = 50;\)\)}], "Input"],
+
+Cell[BoxData[
+    \(\(Report[m/k, g/L];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(Plot[acmaxog[mokgol], {mokgol,  .05, 1}];\)\)], "Input"],
+
+Cell[BoxData[
+    \(MinSafetymokgol[3.5]\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{913, 715},
+WindowMargins->{{4, Automatic}, {Automatic, 1}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 31, 0, 88, "Title"],
+Cell[1810, 55, 66, 0, 52, "Subtitle"],
+Cell[1879, 57, 85, 4, 64, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1989, 65, 24, 0, 69, "Section"],
+Cell[2016, 67, 301, 6, 62, "Text"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2354, 78, 28, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[2407, 82, 41, 0, 38, "Subsection"],
+
+Cell[CellGroupData[{
+Cell[2473, 86, 45, 0, 28, "Subsubsection"],
+Cell[2521, 88, 697, 15, 329, "Input"],
+Cell[3221, 105, 733, 13, 203, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[3991, 123, 33, 0, 28, "Subsubsection"],
+Cell[4027, 125, 429, 7, 133, "Input"],
+Cell[4459, 134, 394, 6, 91, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[4890, 145, 37, 0, 28, "Subsubsection"],
+Cell[4930, 147, 375, 6, 116, "Input"],
+Cell[5308, 155, 394, 6, 91, "Input"],
+Cell[5705, 163, 88, 1, 40, "Input"],
+Cell[5796, 166, 102, 2, 44, "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[5947, 174, 28, 0, 30, "Subsection"],
+
+Cell[CellGroupData[{
+Cell[6000, 178, 33, 0, 28, "Subsubsection"],
+Cell[6036, 180, 468, 7, 91, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6541, 192, 37, 0, 28, "Subsubsection"],
+Cell[6581, 194, 468, 7, 91, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[7086, 206, 32, 0, 28, "Subsubsection"],
+Cell[7121, 208, 1246, 23, 187, "Input"]
+}, Open  ]]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[8428, 238, 31, 0, 39, "Section"],
+Cell[8462, 240, 184, 4, 75, "Input"],
+Cell[8649, 246, 54, 1, 27, "Input"],
+Cell[8706, 249, 78, 1, 27, "Input"],
+Cell[8787, 252, 53, 1, 27, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

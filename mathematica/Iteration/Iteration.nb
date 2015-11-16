@@ -1,0 +1,163 @@
+(***********************************************************************
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used on any computer system with Mathematica 4.0,
+MathReader 4.0, or any compatible application. The data for the notebook 
+starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do one of 
+the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing the 
+word CacheID, otherwise Mathematica-compatible applications may try to 
+use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+***********************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      3331,        106]*)
+(*NotebookOutlinePosition[      3983,        129]*)
+(*  CellTagsIndexPosition[      3939,        125]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+Cell[BoxData[
+    \(\(SetDirectory["\<C:/windows/temp\>"];\)\)], "Input",
+  FontColor->RGBColor[1, 0, 0]],
+
+Cell[CellGroupData[{
+
+Cell["Definitie functies", "Section"],
+
+Cell[BoxData[
+    \(punten[n_, min_, max_] := 
+      Table[{a = Random[Real, {min, max}], 
+          Nest[f, x, 12] /. {x \[Rule] \ Random[]}}, {i, 1, n}]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Iteratie-functies", "Section"],
+
+Cell[BoxData[{
+    \(f[x_] := \ a\ x \((1 - x)\)\), "\n", 
+    \(\(Plot[Nest[f, x, 1] /. {a \[Rule] \ 4}, {x, 0, 1}];\)\), "\n", 
+    \(\(Plot[Nest[f, x, 5] /. {a \[Rule] \ 4}, {x, 0, 1}];\)\), "\n", 
+    \(\(Plot[Nest[f, x, 11] /. {a \[Rule] \ 4}, {x, 0, 1}];\)\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Bifurcatiediagram", "Section"],
+
+Cell[BoxData[
+    \(f[x_] := \ a\ x \((1 - x)\)\)], "Input"],
+
+Cell[BoxData[
+    \(Plot[Nest[f, x, 11] /. {x \[Rule] \  .48645}, {a, 0, 4}, 
+      ImageSize \[Rule] 650]\)], "Input"],
+
+Cell[BoxData[
+    \(\(allepunten = Import["\<Bifurcation.dat\>", "\<Table\>"];\)\)], "Input"],
+
+Cell[BoxData[{
+    \(\(allepunten = Join[allepunten, punten[500, 3.4, 4]];\)\), "\n", 
+    \(plotbifurcatie = 
+      ListPlot[allepunten, ImageSize \[Rule] \ 650, 
+        PlotStyle \[Rule] \ PointSize[ .002], 
+        PlotRange \[Rule] \ All]\)}], "Input"],
+
+Cell[BoxData[{
+    \(Length[allepunten]\), "\[IndentingNewLine]", 
+    \(\(allepunten = Sort[allepunten];\)\)}], "Input"],
+
+Cell[BoxData[
+    \(Export["\<Bifurcation.dat\>", allepunten, "\<Table\>"]\)], "Input"],
+
+Cell[BoxData[
+    \(Export["\<Bifurcation.gif\>", plotbifurcatie]\)], "Input"]
+}, Closed]]
+},
+FrontEndVersion->"4.0 for Microsoft Windows",
+ScreenRectangle->{{0, 800}, {0, 555}},
+WindowSize->{792, 528},
+WindowMargins->{{0, Automatic}, {Automatic, 0}}
+]
+
+
+(***********************************************************************
+Cached data follows.  If you edit this Notebook file directly, not using
+Mathematica, you must remove the line containing CacheID at the top of 
+the file.  The cache data will then be recreated when you save this file 
+from within Mathematica.
+***********************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+Cell[1717, 49, 105, 2, 30, "Input"],
+
+Cell[CellGroupData[{
+Cell[1847, 55, 37, 0, 59, "Section"],
+Cell[1887, 57, 167, 3, 50, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2091, 65, 36, 0, 39, "Section"],
+Cell[2130, 67, 276, 4, 90, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2443, 76, 36, 0, 39, "Section"],
+Cell[2482, 78, 60, 1, 30, "Input"],
+Cell[2545, 81, 119, 2, 30, "Input"],
+Cell[2667, 85, 93, 1, 30, "Input"],
+Cell[2763, 88, 257, 5, 50, "Input"],
+Cell[3023, 95, 121, 2, 50, "Input"],
+Cell[3147, 99, 87, 1, 30, "Input"],
+Cell[3237, 102, 78, 1, 30, "Input"]
+}, Closed]]
+}
+]
+*)
+
+
+
+
+(***********************************************************************
+End of Mathematica Notebook file.
+***********************************************************************)
+

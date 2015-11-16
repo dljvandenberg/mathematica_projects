@@ -1,0 +1,145 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      2881,         94]*)
+(*NotebookOutlinePosition[      3516,        116]*)
+(*  CellTagsIndexPosition[      3472,        112]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Memory test for numbers", "Title"],
+
+Cell["Dennis van den Berg", "Subsubtitle",
+  FontSlant->"Italic"],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell[BoxData[
+    \(RandomNumbers[length_, number_] := 
+      Table[Random[Integer, {10\^\(length - 1\), 10\^length - 1}], {i, 
+          number}]\)], "Input"],
+
+Cell[BoxData[
+    \(TestNumbers[testlist_, reallist_] := 
+      If[Length[testlist] > 
+          Length[reallist], "\<You entered too many numbers\>", "\<Correct: \
+\>" <> ToString[
+            Length[Union[testlist]] + Length[Union[reallist]] - 
+              Length[Union[testlist, reallist]]] <> "\< of \>" <> 
+          ToString[Length[Union[reallist]]]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Test memory", "Section"],
+
+Cell[BoxData[{
+    \(\(numberlist = RandomNumbers[3, 3];\)\), "\[IndentingNewLine]", 
+    \(MatrixForm[numberlist]\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(testlist = {965, 767, 1};\)\), "\n", 
+    \(TestNumbers[testlist, numberlist]\)}], "Input"],
+
+Cell[BoxData[
+    \(MatrixForm[numberlist]\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 696}},
+WindowSize->{520, 569},
+WindowMargins->{{4, Automatic}, {Automatic, 4}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 40, 0, 88, "Title"],
+Cell[1819, 55, 65, 1, 28, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1909, 60, 35, 0, 69, "Section"],
+Cell[1947, 62, 159, 3, 66, "Input"],
+Cell[2109, 67, 371, 7, 139, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2517, 79, 30, 0, 39, "Section"],
+Cell[2550, 81, 128, 2, 43, "Input"],
+Cell[2681, 85, 114, 2, 43, "Input"],
+Cell[2798, 89, 55, 1, 27, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

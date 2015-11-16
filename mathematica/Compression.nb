@@ -1,0 +1,310 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     10283,        245]*)
+(*NotebookOutlinePosition[     10939,        268]*)
+(*  CellTagsIndexPosition[     10895,        264]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Compression", "Title"],
+
+Cell["Huffman algorithm", "Subtitle"],
+
+Cell["\<\
+Dennis van den Berg
+DLJvandenBerg@gmail.com
+2006/06/26\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[BoxData[
+    \(ToBinary[string_String] := 
+      Flatten[Map[IntegerDigits[#, 2, 8] &, 
+          ToCharacterCode[string]]]\)], "Input"],
+
+Cell[BoxData[
+    \(FromBinary[binarylist_List] := 
+      Module[{partitionedlist}, \[IndentingNewLine]partitionedlist = 
+          Partition[
+            Join[binarylist, 
+              Table[0, {i, 1, 8 - Mod[Length[binarylist], 8, 1]}]], 
+            8]; \[IndentingNewLine]StringJoin[
+          Map[FromCharacterCode[FromDigits[#, 2]] &, 
+            partitionedlist]]]\)], "Input"],
+
+Cell[BoxData[
+    \(FrequencyTable[symbollist_List] := 
+      Module[{symbolset}, \[IndentingNewLine]symbolset = 
+          Union[symbollist]; \
+\[IndentingNewLine]Table[\[IndentingNewLine]{symbolset[\([i]\)], 
+            Count[symbollist, symbolset[\([i]\)]]}, \[IndentingNewLine]{i, 
+            Length[symbolset]}]]\)], "Input"],
+
+Cell[BoxData[
+    \(MinFrequencyBranchNumbers[branchlist_List] := 
+      Module[{minfreq}, \[IndentingNewLine]minfreq = 
+          Min[branchlist[\([All, 2]\)]]; \[IndentingNewLine]Position[
+          branchlist[\([All, 2]\)], minfreq]]\)], "Input"],
+
+Cell[BoxData[
+    \(CombineBranches[branch1_List, branch2_List] := 
+      Module[{symbollist, frequencysum, 
+          branchnumberlist}, \[IndentingNewLine]symbollist = 
+          Join[branch1[\([1]\)], 
+            branch2[\([1]\)]]; \[IndentingNewLine]frequencysum = 
+          branch1[\([2]\)] + 
+            branch2[\([2]\)]; \[IndentingNewLine]branchnumberlist = 
+          Join[\[IndentingNewLine]Map[Prepend[#, 0] &, 
+              Drop[branch1, 2]], \[IndentingNewLine]Map[Prepend[#, 1] &, 
+              Drop[branch2, 2]]]; \[IndentingNewLine]{symbollist, 
+          frequencysum, Apply[Sequence, branchnumberlist]}]\)], "Input"],
+
+Cell[BoxData[
+    \(BuildTree[branchlist_List] := \[IndentingNewLine]If[
+        Length[branchlist] \[Equal] 
+          1, \[IndentingNewLine]branchlist[\([1]\)], \
+\[IndentingNewLine]Module[{minposlist, pos1, droppedbranchlist, pos2, 
+            newbranch, newbranchlist}, \[IndentingNewLine]minposlist = 
+            MinFrequencyBranchNumbers[branchlist]; \[IndentingNewLine]pos1 = 
+            minposlist[\([1, 1]\)]; \[IndentingNewLine]droppedbranchlist = 
+            Drop[branchlist, {pos1}]; 
+          pos2 = \(MinFrequencyBranchNumbers[droppedbranchlist]\)[\([1, 
+                1]\)]; \[IndentingNewLine]newbranch = 
+            CombineBranches[branchlist[\([pos1]\)], 
+              droppedbranchlist[\([pos2]\)]]; \
+\[IndentingNewLine]newbranchlist = 
+            Append[Drop[droppedbranchlist, {pos2}], 
+              newbranch]; \[IndentingNewLine]BuildTree[
+            newbranchlist]]]\)], "Input"],
+
+Cell[BoxData[
+    \(HuffmanSubstitutionTable[list_List] := 
+      Module[{frequencytable, branchlist, 
+          tree}, \[IndentingNewLine]frequencytable = 
+          FrequencyTable[list]; \[IndentingNewLine]branchlist = 
+          Map[{{#[\([1]\)]}, #[\([2]\)], {}} &, 
+            frequencytable]; \[IndentingNewLine]tree = 
+          BuildTree[
+            branchlist]; \
+\[IndentingNewLine]Table[\[IndentingNewLine]{tree[\([1, i]\)], 
+            tree[\([i + 2]\)]}, \[IndentingNewLine]{i, 1, 
+            Length[tree[\([1]\)]]}]]\)], "Input"],
+
+Cell[BoxData[
+    \(HuffmanCompress[uncompressed_String] := 
+      Module[{symbolsequencelist, substitutiontable, substitutionrules, 
+          binarycompressed, 
+          compressed}, \[IndentingNewLine]symbolsequencelist = 
+          Characters[uncompressed]; \[IndentingNewLine]substitutiontable = 
+          HuffmanSubstitutionTable[
+            symbolsequencelist]; \[IndentingNewLine]substitutionrules = 
+          Map[#[\([1]\)] \[Rule] #[\([2]\)] &, 
+            substitutiontable]; \[IndentingNewLine]binarycompressed = 
+          Flatten[symbolsequencelist /. 
+              substitutionrules]; \[IndentingNewLine]compressed = 
+          FromBinary[binarycompressed]; \[IndentingNewLine]{compressed, 
+          substitutiontable}]\)], "Input"],
+
+Cell[BoxData[
+    \(HuffmanDecompress[compressed_String, substitutiontable_List] := 
+      Module[{nestedsubstitutionlist, binarycompressed, compressedlength, i, 
+          stack, decompressed}, \[IndentingNewLine]nestedsubstitutionlist = 
+          Module[{maxlength, nestedlist, numbersymbols, 
+              i}, \[IndentingNewLine]maxlength = 
+              Max[Map[Length, 
+                  substitutiontable[\([\)\(All, 
+                    2\)\(]\)]]]; \[IndentingNewLine]nestedlist = 
+              Nest[Table[#, {i, 0, 1}] &, Null, 
+                maxlength]; \[IndentingNewLine]numbersymbols = 
+              Length[substitutiontable]; \[IndentingNewLine]For[
+              i = 1, \[IndentingNewLine]i \[LessEqual] 
+                numbersymbols, \[IndentingNewLine]\(i++\), \
+\[IndentingNewLine]nestedlist = 
+                ReplacePart[nestedlist, 
+                  substitutiontable[\([\)\(i, 1\)\(]\)], 
+                  substitutiontable[\([\)\(i, 2\)\(]\)] + 
+                    1]]; \[IndentingNewLine]nestedlist]; \
+\[IndentingNewLine]binarycompressed = 
+          ToBinary[compressed]; \[IndentingNewLine]For[i = 1; stack = {}; 
+          decompressed = {}; 
+          compressedlength = 
+            Length[binarycompressed], \[IndentingNewLine]i \[LessEqual] 
+            compressedlength, \[IndentingNewLine]\(i++\), \
+\[IndentingNewLine]stack = 
+            Append[stack, 
+              binarycompressed[\([\)\(i\)\(]\)]]; \[IndentingNewLine]If[
+            Length[nestedsubstitutionlist[\([Apply[Sequence, 
+                      stack + 1]]\)]] \[Equal] 
+              0, \[IndentingNewLine]decompressed = 
+              Append[decompressed, 
+                nestedsubstitutionlist[\([Apply[Sequence, 
+                      stack + 
+                        1]]\)]]; \[IndentingNewLine]stack = {}]]; \
+\[IndentingNewLine]StringJoin[decompressed]]\)], "Input"]
+}, Open  ]],
+
+Cell["New functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Test", "Section"],
+
+Cell[BoxData[{
+    \(\(message = "\<Pistol shots ring out in the barroom night. Enter Patty \
+Valentine from the upper hall. She sees the bartender in a pool of blood. \
+Cries out 'My God they killed them all'. Here coms the story of the \
+Hurricane. The man the authorities came to blame. For something that he never \
+done. Put him in a prison cell but one time he could-a been. The champion of \
+the world.\>";\)\), "\n", 
+    \(\({compressed, substitutiontable} = 
+        HuffmanCompress[message];\)\), "\n", 
+    \(\(decompressed = 
+        HuffmanDecompress[compressed, substitutiontable];\)\)}], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(compressed\), "\n", 
+    \(decompressed\)}], "Input"],
+
+Cell[BoxData[
+    \("\[DiscretionaryHyphen]\[EAcute]\[ARing]\[EGrave]\.9c^LO~\.89{\[AAcute]\
+\[IDoubleDot]\.99\f\[Section]\.88\.97r?\[EHat]1\.8a;\[SZ]\[CapitalAE]\.85nfu(\
+y\[Section]\[UDoubleDot]\[Divide]\[CapitalUGrave]\[CapitalNTilde].FC7]v\.84\
+sZP\[CenterDot]\f\.9bs2\.19O\.13\.1f\[ODoubleDot]h{\[CCedilla]\.05\[IHat]\
+\[OHat]_B\.9d]\[IGrave]\[Sterling]\.ba\.9es/|+\[CapitalODoubleDot]\.ba\.8b\.17\
+\[PlusMinus]\.90\[UAcute]\.8b>\[CapitalODoubleDot]\.9e\[CapitalAE]C\.91\
+\[CapitalIAcute]j\.bdGcFUr\.99\.90\[CapitalEAcute]\[ARing]\[Section]R\[UAcute]\
+\.19\f\[IGrave]\[CapitalYAcute]\.13\[CapitalOTilde]s\[IAcute]Gl2\\\[UGrave]\
+\.90\[CapitalIHat]o\.91i\[IGrave]\[OAcute]\.99W$\[CapitalIGrave]\.b2\.9drMG~\
+\[CapitalEth]\.9d\[CapitalEAcute]\[ADoubleDot]{\[OHat]L\.8ea\f\[UHat]\
+\[NonBreakingSpace]hm\.7fj+o\.84zG\.bep]=;\[UGrave]S\[CapitalODoubleDot]\.8aw\
+\[CapitalAHat]\[Thorn]\[CapitalIGrave]\[OHat]\.99\f\.aa\[Divide]\
+\[CapitalODoubleDot]\[CapitalYAcute]\[CapitalIHat]\.14\[CenterDot]\[OTilde]\
+\.1d\[Degree]\[CapitalEHat]\[Sterling]\.92_\[Times]\[OGrave]\[UAcute]\.19\f\
+\[RegisteredTrademark]\.b4\[CapitalODoubleDot]\[CapitalEHat]"\)], "Output"],
+
+Cell[BoxData[
+    \("Pistol shots ring out in the barroom night. Enter Patty Valentine from \
+the upper hall. She sees the bartender in a pool of blood. Cries out 'My God \
+they killed them all'. Here coms the story of the Hurricane. The man the \
+authorities came to blame. For something that he never done. Put him in a \
+prison cell but one time he could-a been. The champion of the world."\)], \
+"Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{913, 668},
+WindowMargins->{{4, Automatic}, {Automatic, 1}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 28, 0, 88, "Title"],
+Cell[1807, 55, 37, 0, 52, "Subtitle"],
+Cell[1847, 57, 85, 4, 64, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1957, 65, 28, 0, 69, "Section"],
+Cell[1988, 67, 141, 3, 27, "Input"],
+Cell[2132, 72, 386, 8, 59, "Input"],
+Cell[2521, 82, 332, 6, 91, "Input"],
+Cell[2856, 90, 249, 4, 59, "Input"],
+Cell[3108, 96, 639, 11, 139, "Input"],
+Cell[3750, 109, 916, 16, 187, "Input"],
+Cell[4669, 127, 547, 11, 123, "Input"],
+Cell[5219, 140, 754, 13, 139, "Input"],
+Cell[5976, 155, 1886, 35, 331, "Input"]
+}, Open  ]],
+Cell[7877, 193, 32, 0, 69, "Section"],
+
+Cell[CellGroupData[{
+Cell[7934, 197, 23, 0, 69, "Section"],
+Cell[7960, 199, 612, 10, 123, "Input"],
+
+Cell[CellGroupData[{
+Cell[8597, 213, 74, 2, 43, "Input"],
+Cell[8674, 217, 1157, 15, 123, "Output"],
+Cell[9834, 234, 409, 6, 75, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

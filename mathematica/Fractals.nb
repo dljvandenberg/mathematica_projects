@@ -1,0 +1,202 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      4642,        141]*)
+(*NotebookOutlinePosition[      5298,        164]*)
+(*  CellTagsIndexPosition[      5254,        160]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Fractals", "Title"],
+
+Cell["Primitive program for plotting fractals", "Subtitle"],
+
+Cell["\<\
+\[Copyright] 2006 Dennis van den Berg
+D.L.J.vandenBerg@phys.uu.nl\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell["\<\
+Calculate the number of iterations f[ f[ f[ var0 ]]] needed to exceed the \
+radius (as measured w.r.t. the origin). 'f' is a function \
+\[DoubleStruckCapitalC] \[Rule] \[DoubleStruckCapitalC].\
+\>", "Text"],
+
+Cell[BoxData[
+    \(NumberOfIterations[f_, var_, var0_, radius_:  100, 
+        maxiterations_:  100] := 
+      Module[{func, z, i}, \[IndentingNewLine]func = 
+          Function[ReplaceAll[f, var \[Rule] #]]; \[IndentingNewLine]For[
+          z = var0; 
+          i = 0, \[IndentingNewLine]Abs[z] < radius\  && \ 
+            i < maxiterations, \[IndentingNewLine]\(i++\), \
+\[IndentingNewLine]z = func[z]]; \[IndentingNewLine]i]\)], "Input"],
+
+Cell["Make a plot of the fractal.", "Text"],
+
+Cell[BoxData[
+    \(PlotFractal[f_, var_, varrange_, radius_:  100, maxiterations_:  100] := 
+      Module[{var0, var1, xmin, xmax, ymin, 
+          ymax}, \[IndentingNewLine]{var0, var1} = 
+          varrange; \[IndentingNewLine]{xmin, ymin} = {Re[var0], 
+            Im[var0]}; \[IndentingNewLine]{xmax, ymax} = {Re[var1], 
+            Im[var1]}; \[IndentingNewLine]ContourPlot[
+          NumberOfIterations[f, var, x + y\ \[ImaginaryI], radius, 
+            maxiterations], {x, xmin, xmax}, {y, ymin, ymax}, 
+          ContourLines \[Rule] False, PlotPoints \[Rule] 100, 
+          ColorFunction \[Rule] \((GrayLevel[1 - #] &)\)]]\)], "Input"],
+
+Cell["\<\
+Calculate the range when zoomed in at point 'var0' with factor \
+'zoomfactor'.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(ZoomedRange[var0_, zoomfactor_] := 
+      var0 + {\(- .5\) -  .5  \[ImaginaryI],  .5 +  .5  \[ImaginaryI]}/
+          zoomfactor\)], "Input"],
+
+Cell["Again plotting the fractal, but now using ZoomedRange[ ].", "Text"],
+
+Cell[BoxData[
+    \(ZoomedFractal[f_, var_, var0_, zoomfactor_, radius_:  100, 
+        maxiterations_:  100] := 
+      PlotFractal[f, var, ZoomedRange[var0, zoomfactor], radius, 
+        maxiterations]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Plot fractals", "Section"],
+
+Cell[BoxData[
+    \(\(f[z_] := z\^2 + 1;\)\)], "Input"],
+
+Cell[BoxData[{
+    \(\(z0 =  .4788037 +  .8494162  \[ImaginaryI];\)\), \
+"\[IndentingNewLine]", 
+    \(NumberOfIterations[f[z], z, z0]\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(zrange = { .478802 +  .849415  \[ImaginaryI],  .478804 +  .849417  \
+\[ImaginaryI]};\)\), "\n", 
+    \(\(PlotFractal[f[z], z, zrange];\)\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(zoomfactor = 100000;\)\), "\n", 
+    \(\(ZoomedFractal[f[z], z, z0, zoomfactor];\)\)}], "Input"],
+
+Cell[BoxData[
+    \(\(\(ZoomedFractal[f[z], z, z0, 10^#] &\)\  /@ Range[6];\)\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 696}},
+WindowSize->{928, 672},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 25, 0, 88, "Title"],
+Cell[1804, 55, 59, 0, 52, "Subtitle"],
+Cell[1866, 57, 96, 3, 46, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1987, 64, 35, 0, 69, "Section"],
+Cell[2025, 66, 216, 4, 30, "Text"],
+Cell[2244, 72, 443, 8, 139, "Input"],
+Cell[2690, 82, 43, 0, 30, "Text"],
+Cell[2736, 84, 646, 10, 123, "Input"],
+Cell[3385, 96, 102, 3, 30, "Text"],
+Cell[3490, 101, 161, 3, 27, "Input"],
+Cell[3654, 106, 73, 0, 30, "Text"],
+Cell[3730, 108, 215, 4, 43, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3982, 117, 32, 0, 39, "Section"],
+Cell[4017, 119, 55, 1, 29, "Input"],
+Cell[4075, 122, 148, 3, 43, "Input"],
+Cell[4226, 127, 173, 3, 43, "Input"],
+Cell[4402, 132, 119, 2, 43, "Input"],
+Cell[4524, 136, 90, 1, 27, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

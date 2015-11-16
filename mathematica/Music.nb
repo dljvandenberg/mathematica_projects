@@ -1,0 +1,164 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      3713,        112]*)
+(*NotebookOutlinePosition[      4348,        134]*)
+(*  CellTagsIndexPosition[      4304,        130]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Sound generator", "Title"],
+
+Cell["\<\
+Dennis van den Berg
+DLJvandenBerg@gmail.com\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell[BoxData[
+    \(InitialiseTones[] := 
+      Module[{a0, as0, b0, c0, cs0, d0, ds0, e0, f0, fs0, g0, 
+          gs0}, \[IndentingNewLine]{a0, as0, b0, c0, cs0, d0, ds0, e0, f0, 
+            fs0, g0, gs0} = 
+          Table[2^\((i/12)\)\ 440, {i, 0, 11}]; \[IndentingNewLine]a[
+            n_Integer] := 2^n\ a0; \[IndentingNewLine]as[n_Integer] := 
+          2^n\ as0; \[IndentingNewLine]b[n_Integer] := 
+          2^n\ b0; \[IndentingNewLine]c[n_Integer] := 
+          2^n\ c0; \[IndentingNewLine]cs[n_Integer] := 
+          2^n\ cs0; \[IndentingNewLine]d[n_Integer] := 
+          2^n\ d0; \[IndentingNewLine]ds[n_Integer] := 
+          2^n\ ds0; \[IndentingNewLine]e[n_Integer] := 
+          2^n\ e0; \[IndentingNewLine]f[n_Integer] := 
+          2^n\ f0; \[IndentingNewLine]fs[n_Integer] := 
+          2^n\ fs0; \[IndentingNewLine]g[n_Integer] := 
+          2^n\ g0; \[IndentingNewLine]gs[n_Integer] := 2^n\ gs0;]\)], "Input"],
+
+Cell[BoxData[
+    \(InitialiseTones[]\)], "Input"],
+
+Cell[BoxData[{
+    \(PureToneFunction[freq_] := Function[Sin[freq\ 2\ Pi\ #]]\), "\n", 
+    \(MixedToneFunction[freq_] := 
+      Function[Sin[
+            freq\ 2\ Pi\ #] +  .5\ Sin[2\ freq\ 2\ Pi\ #] +  .25\ Sin[
+              3\ freq\ 2\ Pi\ #] +  .125\ Sin[4  freq\ 2\ Pi\ #]]\)}], "Input"],
+
+Cell[BoxData[{
+    \(PlayPureTone[freq_, length_] := 
+      Play[\(PureToneFunction[freq]\)[t], {t, 0, 
+          length}]\), "\[IndentingNewLine]", 
+    \(PlayMixedTone[freq_, length_] := 
+      Play[\(MixedToneFunction[freq]\)[t], {t, 0, length}]\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Play sound", "Section"],
+
+Cell[BoxData[
+    \(\(PlayPureTone[e[1], 1];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(PlayMixedTone[e[1], 1];\)\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 696}},
+WindowSize->{996, 661},
+WindowMargins->{{4, Automatic}, {Automatic, 4}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 32, 0, 88, "Title"],
+Cell[1811, 55, 74, 3, 46, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1910, 62, 35, 0, 69, "Section"],
+Cell[1948, 64, 932, 16, 235, "Input"],
+Cell[2883, 82, 50, 1, 27, "Input"],
+Cell[2936, 85, 293, 5, 59, "Input"],
+Cell[3232, 92, 262, 5, 43, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3531, 102, 29, 0, 39, "Section"],
+Cell[3563, 104, 59, 1, 27, "Input"],
+Cell[3625, 107, 60, 1, 27, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

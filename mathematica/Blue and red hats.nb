@@ -1,0 +1,252 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      5745,        177]*)
+(*NotebookOutlinePosition[      6401,        200]*)
+(*  CellTagsIndexPosition[      6357,        196]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Puzzle: blue / red hats", "Title"],
+
+Cell["\<\
+Dennis van den Berg
+DLJvandenBerg@gmail.com
+5/8/2006\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[BoxData[
+    \(Strategy[s_] := IntegerDigits[s, 2, 12]\)], "Input"],
+
+Cell[BoxData[
+    \(Combination[c_] := IntegerDigits[c, 2, 3]\)], "Input"],
+
+Cell[BoxData[
+    \(SingleChoice[strategy_, combination_, person_Integer] := 
+      Block[{entry}, \[IndentingNewLine]entry = 
+          FromDigits[Drop[combination, {person + 1}], 2] + 1 + 
+            4\ person; \[IndentingNewLine]strategy[\([entry]\)]]\)], "Input"],
+
+Cell[BoxData[
+    \(Choices[strategy_, combination_] := 
+      Block[{length}, \[IndentingNewLine]length = 
+          Length[combination]; \[IndentingNewLine]Table[
+          SingleChoice[strategy, combination, person], {person, 0, 
+            length - 1}]]\)], "Input"],
+
+Cell[BoxData[
+    \(PartCorrect[strategy_, combination_] := 
+      Block[{length, choices}, \[IndentingNewLine]length = 
+          Length[combination]; \[IndentingNewLine]choices = 
+          Choices[strategy, combination]; \[IndentingNewLine]Apply[Plus, 
+            Table[If[choices[\([i]\)] \[Equal] combination[\([i]\)], 1, 
+                0], {i, 1, length}]]/length]\)], "Input"],
+
+Cell[BoxData[
+    \(ProbabilityExceedingCorrectLimit[strategy_, correctlimit_] := 
+      Apply[Plus, 
+        Table[If[
+            PartCorrect[strategy, Combination[c]] \[GreaterEqual] 
+              correctlimit, 1/8, 0], {c, 0, 7}]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Find solutions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(\(probabilitytable = 
+        Table[ProbabilityExceedingCorrectLimit[Strategy[s], 2/3], {s, 0, 
+            2\^12 - 1}];\)\), "\[IndentingNewLine]", 
+    \(maxprobability = Max[probabilitytable]\), "\[IndentingNewLine]", 
+    \(beststrategies = 
+      Position[probabilitytable, maxprobability] - 1\)}], "Input"],
+
+Cell[BoxData[
+    \(3\/4\)], "Output"],
+
+Cell[BoxData[
+    \({{89}, {106}, {149}, {166}, {860}, {879}, {912}, {931}, {1289}, {1338}, \
+{1477}, {1526}, {1548}, {1599}, {1728}, {1779}, {2307}, {2352}, {2511}, \
+{2556}, {2566}, {2613}, {2762}, {2809}, {3155}, {3168}, {3231}, {3244}, \
+{3926}, {3941}, {3994}, {4009}}\)], "Output"]
+}, Open  ]],
+
+Cell[BoxData[
+    \(\(\(Print[Strategy[beststrategies[\([#, 1]\)]]] &\) /@ 
+        Range[Length[beststrategies]];\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Notes", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Puzzle", "Subsubsection"],
+
+Cell["\<\
+Three players enter a room and a red or blue hat is placed on each \
+person's head. The color of each hat is determined by a coin toss, with the \
+outcome of one coin toss having no effect on the others. Each person can see \
+the other players' hats but not his own.
+
+No communication of any sort is allowed, except for an initial strategy \
+session before the game begins. Once they have had a chance to look at the \
+other hats, the players must simultaneously guess the color of their own \
+hats. The group shares a hypothetical $3 million prize if at least two \
+players guess correctly.
+
+The problem is to find a strategy for the group that maximizes its chances of \
+winning the prize.\
+\>", "Text"],
+
+Cell["\<\
+One obvious strategy for the players, for instance, would be for \
+all 3 players to always guess \"red\". This would give the group a 50% chance \
+of winning the prize, since 4 out of the 8 possible combinations have at \
+least 2 red hats. But can the group do better...?\
+\>", "Text"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["A solution", "Subsubsection"],
+
+Cell["\<\
+For example strategy 166 is {0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0}, \
+which can be summarized by the rules:
+- person 1 always chooses BLUE
+- person 2 chooses the color opposite to the real color of person 3
+- person 3 chooses RED only if persons 1 and 2 have unequal real colors\
+\>", \
+"Text"]
+}, Closed]]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{913, 668},
+WindowMargins->{{4, Automatic}, {Automatic, 1}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 40, 0, 88, "Title"],
+Cell[1819, 55, 83, 4, 64, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1927, 63, 28, 0, 69, "Section"],
+Cell[1958, 65, 72, 1, 27, "Input"],
+Cell[2033, 68, 74, 1, 27, "Input"],
+Cell[2110, 71, 268, 4, 59, "Input"],
+Cell[2381, 77, 271, 5, 59, "Input"],
+Cell[2655, 84, 386, 6, 75, "Input"],
+Cell[3044, 92, 248, 5, 43, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3329, 102, 33, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[3387, 106, 333, 6, 64, "Input"],
+Cell[3723, 114, 38, 1, 42, "Output"],
+Cell[3764, 117, 287, 4, 59, "Output"]
+}, Open  ]],
+Cell[4066, 124, 129, 2, 27, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[4232, 131, 24, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[4281, 135, 31, 0, 28, "Subsubsection"],
+Cell[4315, 137, 715, 14, 126, "Text"],
+Cell[5033, 153, 295, 5, 46, "Text"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[5365, 163, 35, 0, 22, "Subsubsection"],
+Cell[5403, 165, 302, 7, 78, "Text"]
+}, Closed]]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

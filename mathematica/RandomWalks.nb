@@ -1,0 +1,179 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      3742,        122]*)
+(*NotebookOutlinePosition[      4398,        145]*)
+(*  CellTagsIndexPosition[      4354,        141]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Random Walks", "Title"],
+
+Cell["\<\
+18 / 06 / 2007
+Dennis van den Berg
+DLJvandenBerg@gmail.com\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[BoxData[
+    \(RandomSequence[n_Integer] := 
+      Table[2  Random[Integer] - 1, {i, n}]\)], "Input"],
+
+Cell[BoxData[
+    \(RandomPath[n_Integer] := 
+      Module[{randomsequence, i, s, 
+          path}, \[IndentingNewLine]randomsequence = 
+          RandomSequence[n]; \[IndentingNewLine]For[\[IndentingNewLine]i = 1; 
+          s = 0; path = {}, \[IndentingNewLine]i \[LessEqual] 
+            n, \[IndentingNewLine]\(i++\), \[IndentingNewLine]s = 
+            s + randomsequence[\([i]\)]; \[IndentingNewLine]path = 
+            Append[path, s]]; \[IndentingNewLine]path]\)], "Input"],
+
+Cell[BoxData[
+    \(NoZeroQ[path_List] := 
+      TrueQ[Apply[Times, path] \[NotEqual] 0]\)], "Input"],
+
+Cell[BoxData[
+    \(PFirstZero[n_Integer] := 
+      If[EvenQ[n], \(1\/\(\(2\^n\) \((n - 1)\)\)\) Binomial[n, n\/2], 
+        0]\)], "Input"],
+
+Cell[BoxData[
+    \(NPFirstZero[n_Integer, nrloops_Integer:  10\^4] := 
+      Module[{counter}, \[IndentingNewLine]counter = 
+          0; \[IndentingNewLine]Do[\[IndentingNewLine]randompath = 
+            RandomPath[
+              n]; \[IndentingNewLine]If[\[IndentingNewLine]NoZeroQ[
+                Drop[randompath, \(-1\)]] && 
+              randompath[\([\)\(-1\)\(]\)] \[Equal] 
+                0, \[IndentingNewLine]\(counter++\)], \
+\[IndentingNewLine]{nrloops}]; \[IndentingNewLine]N[
+          counter/nrloops]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Calculations", "Section"],
+
+Cell[BoxData[{
+    \(RandomSequence[10]\), "\n", 
+    \(path = RandomPath[10]\)}], "Input"],
+
+Cell[BoxData[
+    \(\(ListPlot[RandomPath[100], PlotJoined \[Rule] True];\)\)], "Input"],
+
+Cell[BoxData[
+    \(N[PFirstZero[6]]\)], "Input"],
+
+Cell[BoxData[
+    \(NPFirstZero[6, 10\^3]\)], "Input"]
+}, Open  ]],
+
+Cell["New", "Section"]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{913, 715},
+WindowMargins->{{4, Automatic}, {Automatic, 1}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 29, 0, 88, "Title"],
+Cell[1808, 55, 89, 4, 64, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1922, 63, 28, 0, 69, "Section"],
+Cell[1953, 65, 106, 2, 27, "Input"],
+Cell[2062, 69, 481, 8, 155, "Input"],
+Cell[2546, 79, 101, 2, 27, "Input"],
+Cell[2650, 83, 140, 3, 44, "Input"],
+Cell[2793, 88, 534, 10, 160, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[3364, 103, 31, 0, 69, "Section"],
+Cell[3398, 105, 91, 2, 43, "Input"],
+Cell[3492, 109, 88, 1, 27, "Input"],
+Cell[3583, 112, 49, 1, 27, "Input"],
+Cell[3635, 115, 54, 1, 31, "Input"]
+}, Open  ]],
+Cell[3704, 119, 22, 0, 69, "Section"]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

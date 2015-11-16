@@ -1,0 +1,363 @@
+(***********************************************************************
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used on any computer system with Mathematica 4.0,
+MathReader 4.0, or any compatible application. The data for the notebook 
+starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do one of 
+the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing the 
+word CacheID, otherwise Mathematica-compatible applications may try to 
+use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+***********************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      9472,        285]*)
+(*NotebookOutlinePosition[     10124,        308]*)
+(*  CellTagsIndexPosition[     10080,        304]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+Solving a 2 dimensional system of autonomous differential equations\
+\>", "Title",
+  TextAlignment->Center],
+
+Cell["By means of symbolic and/or numerical computation", "Subtitle",
+  TextAlignment->Center],
+
+Cell[CellGroupData[{
+
+Cell["Definition time derivatives", "Section"],
+
+Cell[TextData[{
+  "The system of differential equations is of this form:\n\t",
+  Cell[BoxData[
+      \(TraditionalForm\`\[PartialD]\_t\)]],
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {\(\(\ \)\(x\)\)},
+              {"y"}
+              }], ")"}], TraditionalForm]]],
+  " = ",
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {\(g[x, y]\)},
+              {\(h[x, y]\)}
+              }], ")"}], TraditionalForm]]]
+}], "Text"],
+
+Cell[BoxData[{
+    \(g[x_, y_] := y\^2 + x\^2 - 2\), "\[IndentingNewLine]", 
+    \(h[x_, y_] := x \((y - x)\)\)}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Symbolic solutions", "Section"],
+
+Cell["\<\
+If the equations are simple enough it will be possible to find the functions \
+x[t] and y[t] directly\
+\>", "Text"],
+
+Cell[BoxData[
+    \(generalsolutions = 
+      DSolve[{\[PartialD]\_t\ x[t] == 
+            g[x[t], y[t]], \[PartialD]\_t\ y[t] \[Equal] 
+            h[x[t], y[t]], \[IndentingNewLine]\ x[0] \[Equal] x0, 
+          y[0] \[Equal] y0}, {x, y}, t]\)], "Input"],
+
+Cell[BoxData[
+    \(ParametricPlot[
+      Evaluate[\({x[t], y[t]} /. generalsolutions\) /. {x0 \[Rule] 1, 
+            y0 \[Rule] 1}], {t, 0, 2}, AspectRatio \[Rule] 1]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Numerical solutions", "Section"],
+
+Cell["\<\
+The solutions of more complex systems can be visualised by calculating the \
+numerical solutions.\
+\>", "Text"],
+
+Cell[CellGroupData[{
+
+Cell["Critical points", "Subsection"],
+
+Cell[TextData[{
+  "We begin by computing the critical points of the system. These are defined \
+by:\n\t",
+  Cell[BoxData[
+      \(TraditionalForm\`\[PartialD]\_t\)]],
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {\(\(\ \)\(x\)\)},
+              {"y"}
+              }], ")"}], TraditionalForm]]],
+  " = ",
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {"0"},
+              {"0"}
+              }], ")"}], TraditionalForm]]]
+}], "Text"],
+
+Cell[BoxData[
+    \(criticalpoints = 
+      Union[Solve[{g[x, y] \[Equal] 0, h[x, y] \[Equal] 0}, {x, 
+            y}]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Direction field", "Subsection"],
+
+Cell[BoxData[
+    \(<< Graphics`PlotField`\)], "Input"],
+
+Cell["\<\
+In this picture the vector field is displayed together with the critical \
+points that have been calculated above.\
+\>", "Text"],
+
+Cell[BoxData[{
+    \(\(vectorfieldplot = 
+        PlotVectorField[{g[x, y], h[x, y]}, {x, \(-5\), 5}, {y, \(-5\), 
+            5}, {Axes \[Rule] True, 
+            DisplayFunction \[Rule] Identity}];\)\), "\n", 
+    \(\(criticalpointsplot = 
+        ListPlot[{x, y} /. criticalpoints, {Axes \[Rule] False, 
+            PlotStyle \[Rule] {PointSize[ .025], RGBColor[1, 0, 0]}, 
+            DisplayFunction \[Rule] Identity}];\)\), "\[IndentingNewLine]", 
+    \(Show[vectorfieldplot, 
+      criticalpointsplot, {DisplayFunction \[Rule] $DisplayFunction, 
+        AspectRatio \[Rule] 1}]\)}], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Linear approximations near critical points", "Subsection"],
+
+Cell[TextData[{
+  "To examine the behaviour of the vectorfield near critical points we take a \
+first order linearisation so that we get the matrix equation:\n\t",
+  Cell[BoxData[
+      \(TraditionalForm\`\[PartialD]\_t\)]],
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {\(\(\ \)\(x\)\)},
+              {"y"}
+              }], ")"}], TraditionalForm]]],
+  " \t= ",
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {\(g[x0, y0]\)},
+              {\(h[x0, y0]\)}
+              }], ")"}], TraditionalForm]]],
+  "+ ",
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {\(\[PartialD]\_x\ g[x0, y0]\), \(\[PartialD]\_y\ g[x0, y0]\)},
+              {\(\[PartialD]\_x\ h[x0, y0]\), \(\[PartialD]\_y\ h[x0, y0]\)}
+              }], ")"}], TraditionalForm]]],
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {"x"},
+              {"y"}
+              }], ")"}], TraditionalForm]]],
+  "\n\t\t=",
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {\(\[PartialD]\_x\ g[x0, y0]\), \(\[PartialD]\_y\ g[x0, y0]\)},
+              {\(\[PartialD]\_x\ h[x0, y0]\), \(\[PartialD]\_y\ h[x0, y0]\)}
+              }], ")"}], TraditionalForm]]],
+  Cell[BoxData[
+      FormBox[
+        RowBox[{"(", GridBox[{
+              {"x"},
+              {"y"}
+              }], ")"}], TraditionalForm]]],
+  "\t\t\t\t\t\t\t\t({x,y} near critical point {x0,y0})\nWe can now find a \
+parametrisation by computing the eigenvectors and eigenvalues of the \
+linearised matrix."
+}], "Text"],
+
+Cell[BoxData[{
+    \(linearisedmatrix[
+        criticalpoint___] := {{\[PartialD]\_x\ g[x, y], \[PartialD]\_y\ 
+              g[x, y]}, {\[PartialD]\_x\ h[x, y], \[PartialD]\_y\ h[x, y]}} /. 
+        criticalpoint\), "\n", 
+    \(linearisedsolutions[criticalpoint___] := 
+      Module[{matrix, x1, x2, xr1, xi1, xr2, 
+          xi2}, \[IndentingNewLine]matrix = 
+          linearisedmatrix[criticalpoint]; \n
+        x1[t_] = \(Eigenvectors[
+                matrix]\)[\([\)\(1\)\(]\)] \
+\[ExponentialE]\^\(\(Eigenvalues[matrix]\)[\([\)\(1\)\(]\)] t\); \n
+        x2[t_] = \(Eigenvectors[
+                matrix]\)[\([\)\(2\)\(]\)] \
+\[ExponentialE]\^\(\(Eigenvalues[matrix]\)[\([\)\(2\)\(]\)] t\); \n
+        xr1[t_] = 
+          ComplexExpand[Re[x1[t]], TargetFunctions \[Rule] \ {Re, Im}]; \n
+        xi1[t_] = 
+          ComplexExpand[Im[x1[t]], TargetFunctions \[Rule] \ {Re, Im}]; \n
+        xr2[t_] = 
+          ComplexExpand[Re[x2[t]], TargetFunctions \[Rule] \ {Re, Im}]; \n
+        xi2[t_] = 
+          ComplexExpand[Im[x2[t]], TargetFunctions \[Rule] \ {Re, Im}]; \n
+        If[xi1[t] \[NotEqual] \ Table[0, {Length[xi1[t]]}], {xr1[t], 
+            xi1[t]}, {x1[t], x2[t]}, {xr1[t], xi1[t]}]]\), "\n", 
+    \(displaylinearisedsolutions[criticalpoint___] := 
+      Module[{points, 
+          plots}, \[IndentingNewLine]points = {{x0 \[Rule] \ 0, 
+              y0 \[Rule] \  .5}, {x0 \[Rule]  .5, 
+              y0 \[Rule] 0}, {x0 \[Rule] 0, 
+              y0 \[Rule] \(- .5\)}, {x0 \[Rule] \(- .5\), 
+              y0 \[Rule] 0}, {x0 \[Rule] 0, 
+              y0 \[Rule]  .25}, {x0 \[Rule]  .25, 
+              y0 \[Rule] 0}, {x0 \[Rule] 0, 
+              y0 \[Rule] \(- .25\)}, {x0 \[Rule] \(- .25\), 
+              y0 \[Rule] 
+                0}}; \[IndentingNewLine]solution1 = \(linearisedsolutions[
+              criticalpoint]\)[\([\)\(1\)\(]\)]; \[IndentingNewLine]solution2 \
+= \(linearisedsolutions[criticalpoint]\)[\([\)\(2\)\(]\)]; \n
+        plots = \(ParametricPlot[
+                Evaluate[\(c1\ solution1 + \ c2\ solution2\  /. 
+                      Solve[{c1\ solution1 + \ c2\ solution2 \[Equal] {x0, 
+                                y0} /. {t -> 0}}, {c1, c2}]\) /. #1], {t, 0, 
+                  3}, DisplayFunction \[Rule] \ Identity] &\)\  /@ \ 
+            points; \n
+        Show[plots, {DisplayFunction \[Rule] \ $DisplayFunction, 
+            PlotRange \[Rule] \ {{\(-1\), 1}, {\(-1\), 1}}, 
+            AspectRatio \[Rule] 1, 
+            PlotLabel \[Rule] \ "\<Parametrisations near \>" <> 
+                ToString[criticalpoint]}]]\)}], "Input"],
+
+Cell[BoxData[
+    \(\(\(displaylinearisedsolutions[#1] &\)\  /@ \ 
+        criticalpoints;\)\)], "Input"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"4.0 for Microsoft Windows",
+ScreenRectangle->{{0, 800}, {0, 555}},
+WindowSize->{792, 528},
+WindowMargins->{{0, Automatic}, {Automatic, 0}}
+]
+
+
+(***********************************************************************
+Cached data follows.  If you edit this Notebook file directly, not using
+Mathematica, you must remove the line containing CacheID at the top of 
+the file.  The cache data will then be recreated when you save this file 
+from within Mathematica.
+***********************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1739, 51, 117, 3, 170, "Title"],
+Cell[1859, 56, 94, 1, 64, "Subtitle"],
+
+Cell[CellGroupData[{
+Cell[1978, 61, 46, 0, 59, "Section"],
+Cell[2027, 63, 483, 17, 64, "Text"],
+Cell[2513, 82, 123, 2, 50, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[2673, 89, 37, 0, 39, "Section"],
+Cell[2713, 91, 125, 3, 33, "Text"],
+Cell[2841, 96, 256, 5, 50, "Input"],
+Cell[3100, 103, 181, 3, 50, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[3318, 111, 38, 0, 39, "Section"],
+Cell[3359, 113, 121, 3, 33, "Text"],
+
+Cell[CellGroupData[{
+Cell[3505, 120, 37, 0, 47, "Subsection"],
+Cell[3545, 122, 494, 18, 64, "Text"],
+Cell[4042, 142, 132, 3, 30, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[4211, 150, 37, 0, 47, "Subsection"],
+Cell[4251, 152, 55, 1, 30, "Input"],
+Cell[4309, 155, 138, 3, 33, "Text"],
+Cell[4450, 160, 598, 11, 110, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[5085, 176, 64, 0, 47, "Subsection"],
+Cell[5152, 178, 1583, 47, 122, "Text"],
+Cell[6738, 227, 2586, 49, 472, "Input"],
+Cell[9327, 278, 105, 2, 30, "Input"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+
+(***********************************************************************
+End of Mathematica Notebook file.
+***********************************************************************)
+

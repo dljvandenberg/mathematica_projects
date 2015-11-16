@@ -1,0 +1,667 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     19412,        520]*)
+(*NotebookOutlinePosition[     20069,        543]*)
+(*  CellTagsIndexPosition[     20025,        539]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Game theory & evolution", "Title"],
+
+Cell["Applied to the Iterated Prisoners Dilemma", "Subtitle"],
+
+Cell["\<\
+May-October 2006
+Dennis van den Berg
+DLJvandenBerg@gmail.com\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[BoxData[
+    \(AddMatrixRows[matrix_?MatrixQ] := 
+      Table[Apply[Plus, matrix[\([i]\)]], {i, Length[matrix]}]\)], "Input"],
+
+Cell[BoxData[
+    \(AllowedChoiceQ[choice_] := 
+      TrueQ[choice \[Equal] 1\  || \ choice \[Equal] 2]\)], "Input"],
+
+Cell[BoxData[
+    \(Payoff[payoffmatrix_, choice1_?AllowedChoiceQ, 
+        choice2_?AllowedChoiceQ] := 
+      N[payoffmatrix[\([choice1, choice2]\)]]\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(IteratedGame[payoffmatrix_?PayoffMatrixQ, strategy1_Function, 
+        strategy2_Function, runs_Integer] := 
+      Module[{round, choiceshistory, payoffshistory, choice1, choice2, 
+          payoffs}, \[IndentingNewLine]For[\[IndentingNewLine]round = 
+            1; \[IndentingNewLine]choiceshistory = {}; \
+\[IndentingNewLine]payoffshistory = {}, \[IndentingNewLine]round \[LessEqual] 
+            runs, \[IndentingNewLine]\(round++\), \[IndentingNewLine]choice1 \
+= strategy1[choiceshistory, payoffshistory, 1]; \[IndentingNewLine]choice2 = 
+            strategy2[choiceshistory, payoffshistory, 
+              2]; \[IndentingNewLine]payoffs = 
+            Payoff[payoffmatrix, choice1, 
+              choice2]; \[IndentingNewLine]choiceshistory = 
+            Append[choiceshistory, {choice1, 
+                choice2}]; \[IndentingNewLine]payoffshistory = 
+            Append[payoffshistory, 
+              payoffs]]; \[IndentingNewLine]{choiceshistory, 
+          payoffshistory}]\)], "Input"],
+
+Cell[BoxData[
+    RowBox[{\(General::"spell1"\), \(\(:\)\(\ \)\), "\<\"Possible spelling \
+error: new symbol name \\\"\\!\\(round\\)\\\" is similar to existing symbol \
+\\\"\\!\\(Round\\)\\\". \\!\\(\\*ButtonBox[\\\"More\[Ellipsis]\\\", \
+ButtonStyle->\\\"RefGuideLinkText\\\", ButtonFrame->None, \
+ButtonData:>\\\"General::spell1\\\"]\\)\"\>"}]], "Message"]
+}, Open  ]],
+
+Cell[BoxData[
+    \(IteratedGamePayoff[payoffmatrix_?PayoffMatrixQ, strategy1_Function, 
+        strategy2_Function, runs_Integer] := 
+      Module[{payoffshistory}, \[IndentingNewLine]payoffshistory = \
+\(IteratedGame[payoffmatrix, strategy1, strategy2, 
+              runs]\)[\([2]\)]; \[IndentingNewLine]Apply[Plus, 
+          payoffshistory]]\)], "Input"],
+
+Cell[BoxData[
+    \(CompetitionMatrix[payoffmatrix_?PayoffMatrixQ, strategieslist_List, 
+        runs_Integer] := 
+      Module[{n, upperhalf}, \[IndentingNewLine]n = 
+          Length[strategieslist]; \[IndentingNewLine]upperhalf = 
+          Table[If[
+              i < j, \[IndentingNewLine]{0, 
+                0}, \[IndentingNewLine]IteratedGamePayoff[payoffmatrix, 
+                strategieslist[\([i]\)], strategieslist[\([j]\)], 
+                runs]], \[IndentingNewLine]{i, n}, {j, 
+              n}]; \[IndentingNewLine]Table[\[IndentingNewLine]If[
+            i < j, \[IndentingNewLine]upperhalf[\([j, i, 
+                2]\)], \[IndentingNewLine]upperhalf[\([i, j, 
+                1]\)]], \[IndentingNewLine]{i, n}, {j, n}]]\)], "Input"],
+
+Cell[BoxData[
+    \(CompetitionTotals[payoffmatrix_?PayoffMatrixQ, strategieslist_List, 
+        runs_Integer] := 
+      AddMatrixRows[
+        CompetitionMatrix[payoffmatrix, strategieslist, runs]]\)], "Input"],
+
+Cell[BoxData[
+    \(CompetitionAverages[payoffmatrix_?PayoffMatrixQ, strategieslist_List, 
+        runs_Integer] := 
+      CompetitionTotals[payoffmatrix, strategieslist, 
+          runs]/\((runs\ Length[strategieslist])\)\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Game parameters", "Section"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(PayoffMatrix[a_, b_, c_, d_] := 
+      Module[{}, \[IndentingNewLine]If[
+          Not[a < b < c < d\  || \ d < c < b < a], 
+          Print["\<No Prisoners Dilemma!\>"]]; \[IndentingNewLine]{{{b, 
+              b}, {d, a}}, {{a, d}, {c, c}}}]\)], "Input"],
+
+Cell[BoxData[
+    RowBox[{\(General::"spell1"\), \(\(:\)\(\ \)\), "\<\"Possible spelling \
+error: new symbol name \\\"\\!\\(PayoffMatrix\\)\\\" is similar to existing \
+symbol \\\"\\!\\(PayoffMatrixQ\\)\\\". \\!\\(\\*ButtonBox[\\\"More\[Ellipsis]\
+\\\", ButtonStyle->\\\"RefGuideLinkText\\\", ButtonFrame->None, \
+ButtonData:>\\\"General::spell1\\\"]\\)\"\>"}]], "Message"]
+}, Open  ]],
+
+Cell[BoxData[
+    \(PayoffMatrixQ[payoffmatrix_List] := 
+      TrueQ[Dimensions[payoffmatrix] \[Equal] {2, 2, 2}\  && \ 
+          Min[payoffmatrix] \[NotEqual] Max[payoffmatrix]]\)], "Input"],
+
+Cell[BoxData[
+    \(Gauge[payoffmatrix_?PayoffMatrixQ] := 
+      Module[{minentry, maxentry}, \[IndentingNewLine]minentry = 
+          Min[payoffmatrix]; \[IndentingNewLine]maxentry = 
+          Max[payoffmatrix]; \[IndentingNewLine]\((payoffmatrix - 
+              minentry)\)/\((maxentry - minentry)\)]\)], "Input"],
+
+Cell[BoxData[
+    \(GaugedPayoffMatrix[a_, b_, c_, d_] := 
+      Gauge[PayoffMatrix[a, b, c, d]]\)], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Players' strategies", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Auxiliary functions", "Subsection"],
+
+Cell[BoxData[
+    \(Opposite[choice_] := If[choice \[Equal] 1, 2, 1]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["List of strategies", "Subsection"],
+
+Cell[BoxData[
+    \(\(StratRandom[p_:  .5] = Function[If[Random[] < p, 1, 2]];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(StratTitForTat[cooperatechoices_: {2, 2}] = 
+        Function[\[IndentingNewLine]If[
+            Length[#1] \[Equal] 
+              0, \[IndentingNewLine]cooperatechoices[\([#3]\)], \
+\[IndentingNewLine]#1[\([\(-1\), If[#3 == 1, 2, 1]]\)]]];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(StratTitForTwoTats[cooperatechoices_: {2, 2}] = 
+        Function[\[IndentingNewLine]If[
+            Length[#1] < 
+              2, \[IndentingNewLine]cooperatechoices[\([#3]\)], \
+\[IndentingNewLine]Module[{opponent, 
+                defectchoiceopponent}, \[IndentingNewLine]opponent = 
+                Opposite[#3]; \[IndentingNewLine]defectchoiceopponent = 
+                Opposite[
+                  cooperatechoices[\([opponent]\)]]; \
+\[IndentingNewLine]If[#1[\([{\(-2\), \(-1\)}, 
+                      opponent]\)] \[Equal] {defectchoiceopponent, 
+                    defectchoiceopponent}, \[IndentingNewLine]Opposite[
+                  cooperatechoices[\([#3]\)]], \
+\[IndentingNewLine]cooperatechoices[\([#3]\)]]]]];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(StratCooperate[cooperatechoices_: {2, 2}] = 
+        Function[cooperatechoices[\([#3]\)]];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(StratDefect[cooperatechoices_: {2, 2}] = 
+        Function[Opposite[cooperatechoices[\([#3]\)]]];\)\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Systematically numbered strategies ", "Subsection"],
+
+Cell[BoxData[
+    \(StrategyVector[historylength_Integer, strategynr_:  Integer] := 
+      If[0 < strategynr \[LessEqual] 
+          2\^\(2\^\(historylength + 1\) - 1\), \
+\[IndentingNewLine]Module[{bin12code}, \[IndentingNewLine]bin12code = 
+            Reverse[IntegerDigits[strategynr - 1, 2, 
+                  2\^\(historylength + 1\) - 1]] + 
+              1; \[IndentingNewLine]Table[\[IndentingNewLine]Take[
+              bin12code, {2\^i, 2\^\(i + 1\) - 1}], \[IndentingNewLine]{i, 0, 
+              historylength}]], \[IndentingNewLine]Null]\)], "Input"],
+
+Cell[BoxData[
+    \(StrategyCode[strategyvector_List] := 
+      Module[{historylength, strategynr}, \[IndentingNewLine]historylength = 
+          Length[strategyvector] - 1; \[IndentingNewLine]strategynr = 
+          FromDigits[Reverse[Flatten[strategyvector]] - 1, 2] + 
+            1; \[IndentingNewLine]{historylength, strategynr}]\)], "Input"],
+
+Cell[BoxData[
+    \(StratSystematic[strategyvector_List] := 
+      Module[{strathistlength}, \[IndentingNewLine]strathistlength = 
+          Length[strategyvector] - 
+            1; \[IndentingNewLine]Function[\[IndentingNewLine]Module[{\
+histlength, relevanthistlength, relevanthistory, 
+              stratnr}, \[IndentingNewLine]histlength = 
+              Length[#1]; \[IndentingNewLine]relevanthistlength = 
+              Min[strathistlength, 
+                histlength]; \[IndentingNewLine]relevanthistory = \
+#1[\([Range[\(-relevanthistlength\), \(-1\)], 
+                  If[#3 \[Equal] 1, 2, 1]]\)]; \[IndentingNewLine]stratnr = 
+              FromDigits[relevanthistory - 1, 2] + 
+                1; \[IndentingNewLine]strategyvector[\([relevanthistlength + 
+                  1, stratnr]\)]]]]\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell["Genetic algorithm", "Subsubsection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(GeneticCombination[strategyvector1_List, strategyvector2_List] := 
+      If[Length[strategyvector1] \[NotEqual] 
+          Length[strategyvector2], \[IndentingNewLine]Null, \
+\[IndentingNewLine]Module[{bin12code1, bin12code2, bin12codes, newbin12code, 
+            historylength}, \[IndentingNewLine]bin12code1 = 
+            Flatten[strategyvector1]; \[IndentingNewLine]bin12code2 = 
+            Flatten[strategyvector2]; \[IndentingNewLine]bin12codes = \
+{bin12code1, bin12code2}; \[IndentingNewLine]newbin12code = 
+            Table[\[IndentingNewLine]bin12codes[\([Random[Integer, {1, 2}], 
+                  i]\)], \[IndentingNewLine]{i, 1, 
+                Length[bin12code1]}]; \[IndentingNewLine]historylength = 
+            Length[strategyvector1] - 
+              1; \[IndentingNewLine]Table[\[IndentingNewLine]Take[
+              newbin12code, {2\^i, 2\^\(i + 1\) - 1}], \[IndentingNewLine]{i, 
+              0, historylength}]]]\)], "Input"],
+
+Cell[BoxData[
+    RowBox[{\(General::"spell1"\), \(\(:\)\(\ \)\), "\<\"Possible spelling \
+error: new symbol name \\\"\\!\\(bin12codes\\)\\\" is similar to existing \
+symbol \\\"\\!\\(bin12code\\)\\\". \
+\\!\\(\\*ButtonBox[\\\"More\[Ellipsis]\\\", ButtonStyle->\\\"RefGuideLinkText\
+\\\", ButtonFrame->None, ButtonData:>\\\"General::spell1\\\"]\\)\"\>"}]], \
+"Message"]
+}, Open  ]],
+
+Cell[BoxData[
+    \(GeneticMutation[strategyvector_List, probability_] := 
+      If[Random[] < 
+          probability, \[IndentingNewLine]Module[{historylength, bin12code, 
+            newbin12code}, \[IndentingNewLine]historylength = 
+            Length[strategyvector] - 1; \[IndentingNewLine]bin12code = 
+            Flatten[strategyvector]; \[IndentingNewLine]newbin12code = 
+            ReplacePart[bin12code, Random[Integer, {1, 2}], 
+              Random[Integer, {1, 
+                  Length[bin12code]}]]; \[IndentingNewLine]Table[\
+\[IndentingNewLine]Take[
+              newbin12code, {2\^i, 2\^\(i + 1\) - 1}], \[IndentingNewLine]{i, 
+              0, historylength}]], \[IndentingNewLine]strategyvector]\)], \
+"Input"],
+
+Cell[BoxData[
+    \(RandomVectorsList[historylength_Integer, n_Integer] := 
+      Table[\[IndentingNewLine]StrategyVector[historylength, 
+          Random[Integer, {1, 
+              2\^\(2\^\(historylength + 1\) - 1\)}]], \[IndentingNewLine]{i, 
+          n}]\)], "Input"],
+
+Cell[BoxData[
+    \(SortedNewVectorsList[payoffmatrix_?PayoffMatrixQ, vectorslist_List, 
+        runs_Integer, partselection_:  .5, probmutation_:  0] := 
+      Module[{n, partsel, nselection, selectedvectorslist, 
+          reproducedvectorslist, newvectorslist, newstrategieslist, 
+          competitionresults}, \[IndentingNewLine]n = 
+          Length[vectorslist]; \[IndentingNewLine]partsel = 
+          If[TrueQ[0 \[LessEqual] partselection \[LessEqual] 1], 
+            partselection,  .5]; \[IndentingNewLine]nselection = 
+          Ceiling[partsel\ n]; \[IndentingNewLine]selectedvectorslist = 
+          Take[vectorslist, 
+            nselection]; \[IndentingNewLine]reproducedvectorslist = 
+          Table[\[IndentingNewLine]GeneticMutation[\[IndentingNewLine]\
+GeneticCombination[\[IndentingNewLine]vectorslist[\([\)\(Random[
+                    Integer, {1, 
+                      nselection}]\)\(]\)], \
+\[IndentingNewLine]vectorslist[\([\)\(Random[
+                    Integer, {1, 
+                      nselection}]\)\(]\)]], \
+\[IndentingNewLine]probmutation], \[IndentingNewLine]{n - 
+                nselection}]; \[IndentingNewLine]newvectorslist = 
+          Join[selectedvectorslist, 
+            reproducedvectorslist]; \[IndentingNewLine]newstrategieslist = 
+          Map[StratSystematic[#] &, 
+            newvectorslist]; \[IndentingNewLine]competitionresults = 
+          CompetitionAverages[payoffmatrix, newstrategieslist, 
+            runs]; \[IndentingNewLine]\(Reverse[\[IndentingNewLine]Sort[\
+\[IndentingNewLine]Table[\[IndentingNewLine]{competitionresults[\([\)\(i\)\(]\
+\)], newvectorslist[\([\)\(i\)\(]\)]}, \[IndentingNewLine]{i, 1, 
+                  n}]]]\)[\([All, 2]\)]]\)], "Input"],
+
+Cell[BoxData[
+    \(IteratedVectorsList[payoffmatrix_?PayoffMatrixQ, vectorslist_List, 
+        runs_Integer, rounds_Integer, partselection_:  .5, 
+        probmutation_:  0] := 
+      Nest[\[IndentingNewLine]SortedNewVectorsList[payoffmatrix, #, runs, 
+            partselection, 
+            probmutation] &, \[IndentingNewLine]vectorslist, \
+\[IndentingNewLine]rounds]\)], "Input"]
+}, Open  ]]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Run game", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Initialise some variables", "Subsubsection"],
+
+Cell[BoxData[{
+    \(\(payoffmatrix = 
+        GaugedPayoffMatrix[\(-10\), \(-5\), 5, 10];\)\), "\n", 
+    \(\(runs = 100;\)\)}], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(payoffmatrix // MatrixForm\)], "Input"],
+
+Cell[BoxData[
+    TagBox[
+      RowBox[{"(", "\[NoBreak]", GridBox[{
+            {
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(1\/4\)},
+                      {\(1\/4\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}], 
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {"1"},
+                      {"0"}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}]},
+            {
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {"0"},
+                      {"1"}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}], 
+              RowBox[{"(", "\[NoBreak]", 
+                TagBox[GridBox[{
+                      {\(3\/4\)},
+                      {\(3\/4\)}
+                      },
+                    RowSpacings->1,
+                    ColumnAlignments->{Left}],
+                  Column], "\[NoBreak]", ")"}]}
+            },
+          RowSpacings->1,
+          ColumnSpacings->1,
+          ColumnAlignments->{Left}], "\[NoBreak]", ")"}],
+      Function[ BoxForm`e$, 
+        MatrixForm[ BoxForm`e$]]]], "Output"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Competition between a couple of strategies", "Subsubsection"],
+
+Cell[BoxData[{
+    \(\(alwaystwo = StratRandom[0];\)\), "\n", 
+    \(\(alwaysone = StratRandom[1];\)\), "\n", 
+    \(\(random = StratRandom[];\)\), "\[IndentingNewLine]", 
+    \(\(titfortat = StratTitForTat[];\)\), "\[IndentingNewLine]", 
+    \(\(titfortwotats = StratTitForTwoTats[];\)\), "\[IndentingNewLine]", 
+    \(\(strategieslist = {alwaystwo, alwaysone, random, titfortat, 
+          titfortwotats};\)\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(competitionmatrix = 
+        CompetitionMatrix[payoffmatrix, strategieslist, 
+          runs];\)\), "\[IndentingNewLine]", 
+    \(% // MatrixForm\), "\[IndentingNewLine]", 
+    \(\(competitionaverages = 
+        AddMatrixRows[
+            competitionmatrix]/\((runs\ Length[
+                strategieslist])\);\)\), "\[IndentingNewLine]", 
+    \(% // MatrixForm\)}], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Competition between all strategies with historylength = 2", \
+"Subsubsection"],
+
+Cell[BoxData[{
+    \(\(historylength = 2;\)\), "\[IndentingNewLine]", 
+    \(\(strategieslist2all = 
+        Table[\[IndentingNewLine]StratSystematic[
+            StrategyVector[historylength, 
+              strategynr]], \[IndentingNewLine]{strategynr, 1, 
+            2\^\(2\^\(historylength + 1\) - 1\)}];\)\)}], "Input"],
+
+Cell[BoxData[{
+    \(\(competitionmatrix = 
+        CompetitionMatrix[payoffmatrix, strategieslist2all, 
+          runs];\)\), "\n", 
+    \(\(competitionaverages = 
+        AddMatrixRows[
+            competitionmatrix]/\((runs\ Length[
+                strategieslist2all])\);\)\), "\n", 
+    \(% // MatrixForm\)}], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Using genetic algorithm", "Subsubsection"],
+
+Cell[BoxData[{
+    \(\(randomvectorslist = RandomVectorsList[3, 50];\)\), "\n", 
+    \(\(vlisti = 
+        IteratedVectorsList[payoffmatrix, randomvectorslist, runs, 
+          50,  .8,  .04];\)\), "\n", 
+    \(% // MatrixForm\)}], "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Notes", "Section"],
+
+Cell[TextData[{
+  "-\tI would expect IteratedGame to be of linear order in runs, but for runs \
+> 2000 the calculations take much longer. Why? Is ",
+  StyleBox["Mathematica",
+    FontSlant->"Italic"],
+  " so bad in handling long lists?"
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell["To do", "Subsection"],
+
+Cell["\<\
+
+-\tAdd function descriptions. (Arguments of strategies: #1=choiceshistory, \
+#2=payoffshistory, #3=playernumber)\
+\>", "Text"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{1016, 721},
+WindowMargins->{{4, Automatic}, {Automatic, 1}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 40, 0, 88, "Title"],
+Cell[1819, 55, 61, 0, 52, "Subtitle"],
+Cell[1883, 57, 91, 4, 64, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1999, 65, 28, 0, 69, "Section"],
+Cell[2030, 67, 130, 2, 27, "Input"],
+Cell[2163, 71, 116, 2, 27, "Input"],
+Cell[2282, 75, 163, 3, 27, "Input"],
+
+Cell[CellGroupData[{
+Cell[2470, 82, 1019, 17, 235, "Input"],
+Cell[3492, 101, 358, 5, 21, "Message"]
+}, Open  ]],
+Cell[3865, 109, 359, 6, 75, "Input"],
+Cell[4227, 117, 754, 13, 203, "Input"],
+Cell[4984, 132, 211, 4, 43, "Input"],
+Cell[5198, 138, 235, 4, 43, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[5470, 147, 34, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[5529, 151, 276, 5, 59, "Input"],
+Cell[5808, 158, 373, 5, 70, "Message"]
+}, Open  ]],
+Cell[6196, 166, 192, 3, 43, "Input"],
+Cell[6391, 171, 317, 5, 75, "Input"],
+Cell[6711, 178, 109, 2, 27, "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[6857, 185, 38, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[6920, 189, 41, 0, 38, "Subsection"],
+Cell[6964, 191, 81, 1, 27, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[7082, 197, 40, 0, 38, "Subsection"],
+Cell[7125, 199, 93, 1, 27, "Input"],
+Cell[7221, 202, 278, 5, 75, "Input"],
+Cell[7502, 209, 766, 14, 155, "Input"],
+Cell[8271, 225, 127, 2, 27, "Input"],
+Cell[8401, 229, 134, 2, 27, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[8572, 236, 57, 0, 38, "Subsection"],
+Cell[8632, 238, 564, 9, 167, "Input"],
+Cell[9199, 249, 347, 5, 75, "Input"],
+Cell[9549, 256, 819, 14, 155, "Input"],
+
+Cell[CellGroupData[{
+Cell[10393, 274, 42, 0, 28, "Subsubsection"],
+
+Cell[CellGroupData[{
+Cell[10460, 278, 973, 15, 253, "Input"],
+Cell[11436, 295, 369, 6, 21, "Message"]
+}, Open  ]],
+Cell[11820, 304, 731, 13, 174, "Input"],
+Cell[12554, 319, 273, 5, 72, "Input"],
+Cell[12830, 326, 1729, 29, 379, "Input"],
+Cell[14562, 357, 384, 7, 107, "Input"]
+}, Open  ]]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[15007, 371, 27, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[15059, 375, 50, 0, 28, "Subsubsection"],
+Cell[15112, 377, 138, 3, 43, "Input"],
+
+Cell[CellGroupData[{
+Cell[15275, 384, 59, 1, 27, "Input"],
+Cell[15337, 387, 1474, 42, 121, "Output"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[16860, 435, 67, 0, 28, "Subsubsection"],
+Cell[16930, 437, 423, 7, 107, "Input"],
+Cell[17356, 446, 398, 9, 75, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[17791, 460, 84, 1, 28, "Subsubsection"],
+Cell[17878, 463, 324, 6, 87, "Input"],
+Cell[18205, 471, 323, 8, 59, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[18565, 484, 48, 0, 28, "Subsubsection"],
+Cell[18616, 486, 240, 5, 59, "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[18905, 497, 24, 0, 39, "Section"],
+Cell[18932, 499, 248, 6, 32, "Text"],
+
+Cell[CellGroupData[{
+Cell[19205, 509, 27, 0, 38, "Subsection"],
+Cell[19235, 511, 137, 4, 46, "Text"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

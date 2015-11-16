@@ -1,0 +1,405 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     12983,        322]*)
+(*NotebookOutlinePosition[     13640,        345]*)
+(*  CellTagsIndexPosition[     13596,        341]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["3D bodies", "Title"],
+
+Cell["Motion in space", "Subtitle"],
+
+Cell["\<\
+Dennis van den Berg
+DLJvandenBerg@gmail.com
+2006/07/12\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["General", "Subsection"],
+
+Cell[BoxData[
+    \(ProperLineList[linelist_List] := 
+      Flatten[\[IndentingNewLine]Map[\[IndentingNewLine]Table[#[\([{i, 
+                    i + 1}]\)], {i, 
+                Length[#] - 
+                  1}] &, \[IndentingNewLine]linelist], \
+\[IndentingNewLine]1]\)], "Input"],
+
+Cell[BoxData[
+    \(Normalise[v_?VectorQ] := 
+      Module[{vnorm}, \[IndentingNewLine]vnorm = 
+          Norm[v]; \[IndentingNewLine]If[vnorm \[NotEqual] 0, v\/vnorm, 
+          v]]\)], "Input"],
+
+Cell[BoxData[
+    \(BasisTransformation[p_?VectorQ, basis_?MatrixQ] := 
+      Module[{k, d}, \[IndentingNewLine]{k, d} = 
+          Dimensions[basis]; \[IndentingNewLine]If[
+          Length[p] \[Equal] 
+            d, \[IndentingNewLine]Table[\[IndentingNewLine]Module[{vi, 
+                normi}, \[IndentingNewLine]vi = 
+                basis[\([i]\)]; \[IndentingNewLine]normi = 
+                Norm[vi]; \[IndentingNewLine]If[
+                normi \[NotEqual] 0, \((p . vi)\)\/normi\^2, 
+                0]], \[IndentingNewLine]{i, 
+              k}], \[IndentingNewLine]Unevaluated[
+            BasisTransformation[p, basis]]]]\)], "Input"],
+
+Cell[BoxData[
+    \(Projection[p_?VectorQ, basis_?MatrixQ] := 
+      BasisTransformation[p, Map[Normalise, basis]]\)], "Input"],
+
+Cell[BoxData[
+    \(Rotation[p_?VectorQ, basis_?MatrixQ] := 
+      Module[{k, d, basisnorm}, \[IndentingNewLine]{k, d} = 
+          Dimensions[basis]; \[IndentingNewLine]basisnorm = 
+          Map[Normalise, basis]; \[IndentingNewLine]If[
+          k \[Equal] d && 
+            basisnorm . basisnorm == 
+              IdentityMatrix[d], \[IndentingNewLine]BasisTransformation[p, 
+            basisnorm], \[IndentingNewLine]Unevaluated[
+            Rotation[p, basis]]]]\)], "Input"],
+
+Cell[BoxData[
+    \(Angle[p_?VectorQ, q_?VectorQ] := 
+      Module[{pnorm, qnorm}, \[IndentingNewLine]pnorm = 
+          Norm[p]; \[IndentingNewLine]qnorm = Norm[q]; \[IndentingNewLine]If[
+          pnorm \[Equal] 0 || 
+            qnorm \[Equal] 0, \[IndentingNewLine]0, \[IndentingNewLine]ArcCos[
+            p . q\/\(pnorm\ qnorm\)]]]\)], "Input"],
+
+Cell[BoxData[
+    \(Vector3DQ[p_] := \((VectorQ[p] && Length[p] \[Equal] 3)\)\)], "Input"],
+
+Cell[BoxData[
+    \(RotationVector3D[p_?Vector3DQ, q_?Vector3DQ] := 
+      Angle[p, q]\ Normalise[Cross[p, q]]\)], "Input"],
+
+Cell[BoxData[
+    \(RotationAroundAxis3D[p_?Vector3DQ, axis_?Vector3DQ] := 
+      Module[{angle, axisdirection}, \[IndentingNewLine]angle = 
+          Norm[axis]; \[IndentingNewLine]axisdirection = 
+          Normalise[axis]; \[IndentingNewLine]Cos[angle] p + 
+          Sin[angle] Cross[axisdirection, p]]\)], "Input"],
+
+Cell[BoxData[
+    \(\(RelativeCoordinate3D::"\<updirection\>" = "\<Vector 'up' is a \
+multiple of the viewing direction.\>";\)\)], "Input"],
+
+Cell[BoxData[
+    \(RelativeCoordinate3D[p_?Vector3DQ, viewpoint_?Vector3DQ, 
+        center_: {0, 0, 0}, up_: {1, 0, 0}] := 
+      Module[{direction, updir, right, 
+          basisnew}, \[IndentingNewLine]direction = 
+          If[viewpoint \[NotEqual] center, \[IndentingNewLine]Normalise[
+              center - viewpoint], \[IndentingNewLine]{0, 0, 
+              1}]; \[IndentingNewLine]updir = 
+          Normalise[
+            up - \((up . direction)\) direction]; \[IndentingNewLine]If[
+          Norm[updir] \[Equal] 
+            0, \[IndentingNewLine]Module[{tempdir1, 
+              tempdir2}, \[IndentingNewLine]Message[
+              RelativeCoordinate3D::"\<updirection\>"]; \
+\[IndentingNewLine]tempdir1 = 
+              updir - {0, 10\^\(-3\), 0}; \[IndentingNewLine]tempdir2 = 
+              updir - {10\^\(-3\), 0, 0}; \[IndentingNewLine]tempdir3 = 
+              Normalise[
+                tempdir1 - \((tempdir1 . direction)\) 
+                    direction]; \[IndentingNewLine]tempdir4 = 
+              Normalise[
+                tempdir2 - \((tempdir2 . direction)\) 
+                    direction]; \[IndentingNewLine]If[
+              Norm[tempdir3] \[NotEqual] 0, \[IndentingNewLine]updir = 
+                tempdir3, \[IndentingNewLine]updir = 
+                tempdir4]]]; \[IndentingNewLine]right = 
+          Cross[direction, updir]; \[IndentingNewLine]basisnew = {right, 
+            updir, direction}; \[IndentingNewLine]BasisTransformation[
+          p - viewpoint, basisnew]]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Graphics", "Subsection"],
+
+Cell[BoxData[
+    \(DrawPoints[coordinatelist_?MatrixQ, zoomfactor_:  1, 
+        viewpoint_: {2, 3, 1}, center_: {0, 0, 0}, up_: {0, 0, 1}] := 
+      Module[{relativecoordinatelist, posrelativecoordinatelist, 
+          xylist}, \[IndentingNewLine]relativecoordinatelist = 
+          Map[RelativeCoordinate3D[#, viewpoint, center, up] &, 
+            coordinatelist]; \[IndentingNewLine]posrelativecoordinatelist = 
+          Select[relativecoordinatelist, #[\([3]\)] > 
+                0 &]; \[IndentingNewLine]xylist = 
+          Map[\(\( .01  
+                      zoomfactor\)\/Abs[#[\([3]\)]]\) {#[\([1]\)], \
+#[\([2]\)]} &, posrelativecoordinatelist]; \[IndentingNewLine]Show[
+          Graphics[Map[Point[#[\([{1, 2}]\)]] &, xylist]], 
+          PlotRange \[Rule] {{\(- .01\),  .01}, {\(- .01\),  .01}}, 
+          ImageSize \[Rule] 400, AspectRatio \[Rule] 1]]\)], "Input"],
+
+Cell[BoxData[
+    \(DrawDisks[coordinatelist_?MatrixQ, zoomfactor_:  1, 
+        viewpoint_: {2, 3, 1}, center_: {0, 0, 0}, up_: {0, 0, 1}, 
+        radius_:  .01] := 
+      Module[{relativecoordinatelist, RelativeR, 
+          xyrlist}, \[IndentingNewLine]relativecoordinatelist = 
+          Map[RelativeCoordinate3D[#, viewpoint, center, up] &, 
+            coordinatelist]; \[IndentingNewLine]RelativeR[z_] := 
+          If[z > radius +  .01, radius\/\@\(1 - \((radius/z)\)\^2\), 
+            0]; \[IndentingNewLine]xyrlist = 
+          Map[\(\( .01  
+                      zoomfactor\)\/Abs[#[\([3]\)]]\) {#[\([1]\)], \
+#[\([2]\)], RelativeR[#[\([3]\)]]} &, 
+            relativecoordinatelist]; \[IndentingNewLine]Show[
+          Graphics[Map[Disk[#[\([{1, 2}]\)], #[\([3]\)]] &, xyrlist]], 
+          PlotRange \[Rule] {{\(- .01\),  .01}, {\(- .01\),  .01}}, 
+          ImageSize \[Rule] 400, AspectRatio \[Rule] 1]]\)], "Input"],
+
+Cell[BoxData[
+    \(DrawLines[linelist_List, zoomfactor_:  1, viewpoint_: {2, 3, 1}, 
+        center_: {0, 0, 0}, up_: {0, 0, 1}] := 
+      Module[{relativelinelist, ScreenCoordinates, 
+          xylist}, \[IndentingNewLine]relativelinelist = 
+          ProperLineList[
+            Table[\[IndentingNewLine]Map[
+                RelativeCoordinate3D[#, viewpoint, center, up] &, 
+                linelist[\([i]\)]], \[IndentingNewLine]{i, 
+                Length[linelist]}]]; \[IndentingNewLine]ScreenCoordinates[
+            line_] := Map[\(\( .01  
+                      zoomfactor\)\/Abs[#[\([\)\(3\)\(]\)]]\) \
+{#[\([\)\(1\)\(]\)], #[\([\)\(2\)\(]\)]} &, 
+            line]; \[IndentingNewLine]For[\[IndentingNewLine]i = 1; 
+          xylist = {}, \[IndentingNewLine]i \[LessEqual] 
+            Length[relativelinelist], \[IndentingNewLine]\(i++\), \
+\[IndentingNewLine]Module[{z1, z2}, \[IndentingNewLine]z1 = 
+              relativelinelist[\([\)\(i, 1, 
+                3\)\(]\)]; \[IndentingNewLine]z2 = 
+              relativelinelist[\([\)\(i, 2, 
+                3\)\(]\)]; \[IndentingNewLine]Which[z1 > 0\  && \ z2 > 0, 
+              xylist = 
+                Append[\[IndentingNewLine]xylist, \
+\[IndentingNewLine]ScreenCoordinates[
+                    relativelinelist[\([\)\(i\)\(]\)]]], \
+\[IndentingNewLine]z1 > 0\  && \ 
+                z2 \[LessEqual] 0, \[IndentingNewLine]xylist = 
+                Append[\[IndentingNewLine]xylist, \[IndentingNewLine]Module[{ \
+(*point1, point2, virtualpoint2*) }, \[IndentingNewLine]point1 = 
+                      relativelinelist[\([\)\(i, 
+                        1\)\(]\)]; \[IndentingNewLine]point2 = 
+                      relativelinelist[\([\)\(i, 
+                        2\)\(]\)]; \[IndentingNewLine]virtualpoint2 = 
+                      Normalise[
+                          point1 - \(point1[\([\)\(3\)\(]\)]\/\((point2 - 
+                                        point1)\)[\([\)\(3\)\(]\)]\) \
+\((point2 - point1)\)] + {0, 0, 
+                          10^\(-4\)/
+                            zoomfactor}; \
+\[IndentingNewLine]ScreenCoordinates[{point1, 
+                        virtualpoint2}]]], \[IndentingNewLine]z1 \[LessEqual] 
+                  0\  && \ z2 > 0, \[IndentingNewLine]xylist = 
+                Append[\[IndentingNewLine]xylist, \
+\[IndentingNewLine]Module[{point1, point2, 
+                      virtualpoint1}, \[IndentingNewLine]point1 = 
+                      relativelinelist[\([\)\(i, 
+                        1\)\(]\)]; \[IndentingNewLine]point2 = 
+                      relativelinelist[\([\)\(i, 
+                        2\)\(]\)]; \[IndentingNewLine]virtualpoint1 = 
+                      Normalise[
+                          point2 - \(point2[\([3]\)]\/\((point1 - 
+                                        point2)\)[\([\)\(3\)\(]\)]\) \
+\((point1 - point2)\)] + {0, 0, 
+                          10^\(-4\)/
+                            zoomfactor}; \
+\[IndentingNewLine]ScreenCoordinates[{point2, 
+                        virtualpoint1}]]]]]]; \[IndentingNewLine]Show[
+          Graphics[Map[Line, xylist[\([All, All, {1, 2}]\)]]], 
+          PlotRange \[Rule] {{\(- .01\),  .01}, {\(- .01\),  .01}}, 
+          ImageSize \[Rule] 400, AspectRatio \[Rule] 1]]\)], "Input"]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Calculations", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Motion in space", "Subsection"],
+
+Cell[BoxData[
+    \(\(coordinatelist3 = 
+        Table[{Random[Real, {\(- .5\),  .5}], Random[Real, {\(- .5\),  .5}], 
+            Random[Real, {\(- .5\),  .5}]}, {20}];\)\)], "Input"],
+
+Cell[BoxData[{
+    \(Trajectory[t_] := {2 \((t\^2 +  .1)\)\ Cos[2\ Pi\ t], 
+        2 \((t\^2 +  .1)\)\ Sin[2\ Pi\ t], 0}\), "\n", 
+    \(\(frames = \(DrawDisks[coordinatelist3, 1, 
+              Trajectory[#], {0, 0, 0}, {0, 0, 1},  .01] &\)\  /@ 
+          Range[\(-0.8\),  .8,  .01];\)\)}], "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Test", "Section"],
+
+Cell[BoxData[
+    \(\(pointlist = 
+        Module[{tmp}, \[IndentingNewLine]tmp = 
+            Table[{Cos[
+                  u],  .1\ u \((2  Pi - u)\)\ Cos[u]^2,  .1\ u \((2  Pi - 
+                      u)\)\ Sin[u]}, {u, 0, 
+                2  Pi,  .1}]; \[IndentingNewLine]Append[tmp, 
+            tmp[\([1]\)]]];\)\)], "Input"],
+
+Cell[BoxData[
+    RowBox[{\(trajectory[t_]\), ":=", 
+      RowBox[{"RotationAroundAxis3D", "[", 
+        RowBox[{
+          RowBox[{"{", 
+            RowBox[{Cell["2"], ",", "0", ",", "0"}], "}"}], 
+          ",", \(t {0, 0, 2\ Pi}\)}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+    \(\(Table[
+        DrawLines[{pointlist}, 1, trajectory[t], {0, 0, 0}, {0, 0, 1}], {t, 
+          0, 1,  .05}];\)\)], "Input"]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 695}},
+WindowSize->{913, 668},
+WindowMargins->{{10, Automatic}, {Automatic, 1}},
+ShowSelection->True
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 26, 0, 88, "Title"],
+Cell[1805, 55, 35, 0, 52, "Subtitle"],
+Cell[1843, 57, 85, 4, 64, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1953, 65, 28, 0, 69, "Section"],
+
+Cell[CellGroupData[{
+Cell[2006, 69, 29, 0, 38, "Subsection"],
+Cell[2038, 71, 283, 6, 91, "Input"],
+Cell[2324, 79, 195, 4, 76, "Input"],
+Cell[2522, 85, 649, 12, 208, "Input"],
+Cell[3174, 99, 127, 2, 27, "Input"],
+Cell[3304, 103, 482, 9, 107, "Input"],
+Cell[3789, 114, 350, 6, 131, "Input"],
+Cell[4142, 122, 90, 1, 27, "Input"],
+Cell[4235, 125, 123, 2, 27, "Input"],
+Cell[4361, 129, 319, 5, 91, "Input"],
+Cell[4683, 136, 139, 2, 27, "Input"],
+Cell[4825, 140, 1522, 28, 342, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6384, 173, 30, 0, 38, "Subsection"],
+Cell[6417, 175, 883, 14, 151, "Input"],
+Cell[7303, 191, 935, 16, 192, "Input"],
+Cell[8241, 209, 3269, 59, 692, "Input"]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[11559, 274, 31, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[11615, 278, 37, 0, 38, "Subsection"],
+Cell[11655, 280, 184, 3, 43, "Input"],
+Cell[11842, 285, 302, 5, 64, "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[12193, 296, 23, 0, 39, "Section"],
+Cell[12219, 298, 331, 7, 59, "Input"],
+Cell[12553, 307, 255, 6, 31, "Input"],
+Cell[12811, 315, 144, 3, 27, "Input"]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

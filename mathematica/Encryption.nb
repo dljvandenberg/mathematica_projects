@@ -1,0 +1,296 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.2'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      7017,        213]*)
+(*NotebookOutlinePosition[      7652,        235]*)
+(*  CellTagsIndexPosition[      7608,        231]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Encryption", "Title"],
+
+Cell["Using RSA algorithm", "Subtitle"],
+
+Cell["\<\
+Dennis van den Berg
+D.L.J.vandenBerg@phys.uu.nl\
+\>", "Subsubtitle"],
+
+Cell[CellGroupData[{
+
+Cell["Define functions", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["General functions", "Subsection"],
+
+Cell[BoxData[
+    \(EuclideanAlgorithm[m_, n_] := 
+      Block[{xi, xii, ki, 
+          kii}, \[IndentingNewLine]For[{xi, xii} = {0, 1}; {ki, kii} = {n, 
+              m}, \[IndentingNewLine]kii \[NotEqual] 
+            0, , \[IndentingNewLine]{xi, xii} = {xii, 
+              xi - Floor[ki/kii] xii}; \[IndentingNewLine]{ki, kii} = {kii, 
+              Mod[ki, kii]}]; \[IndentingNewLine]{If[ki \[Equal] 1, 
+            Mod[xi, n], 0], ki}]\)], "Input"],
+
+Cell[BoxData[
+    \(DiscreteInverse[m_, n_] := 
+      Block[{inv = \(EuclideanAlgorithm[m, 
+                n]\)[\([1]\)]}, \[IndentingNewLine]If[inv \[Equal] 0, 
+          Print["\<No Inverse\>"]; 0, inv]]\)], "Input"],
+
+Cell[BoxData[
+    \(GreatestCommonDivisor[m_, 
+        n_] := \(EuclideanAlgorithm[m, n]\)[\([2]\)]\)], "Input"],
+
+Cell[BoxData[
+    \(PartitionString[string_, len_] := 
+      Partition[Characters[string], len, len, {1, 1}, "\<\>"]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Generate keys", "Subsection"],
+
+Cell[BoxData[
+    \(GenerateKeys[bits_] := 
+      Block[{p, q, n, phi, k, l, publickey, 
+          secretkey}, \[IndentingNewLine]For[p = 1, 
+          PrimeQ[p] \[Equal] False, , 
+          p = Random[
+              Integer, {2\^Floor[bits/2 - 1], 
+                2\^Floor[bits/2] - 1}]]; \[IndentingNewLine]For[q = 1, 
+          PrimeQ[q] \[Equal] False, , 
+          q = Random[
+              Integer, {2\^Ceiling[bits/2 - 1], 
+                2\^Ceiling[bits/2] - 1}]]; \[IndentingNewLine]n = 
+          p\ q; \[IndentingNewLine]phi = \((p - 1)\) \((q - 
+                1)\); \[IndentingNewLine]For[k = phi, 
+          GreatestCommonDivisor[k, phi] \[NotEqual] 1, , 
+          k = Random[Integer, {2\^Floor[bits/2 - 1], 2\^Floor[bits/2] - 1}]]; 
+        l = DiscreteInverse[k, phi]; \[IndentingNewLine]publickey = {k, n, 
+            bits}; \[IndentingNewLine]secretkey = {l, n, 
+            bits}; \[IndentingNewLine]{publickey, secretkey}]\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Encryption / decrytion", "Subsection"],
+
+Cell[BoxData[
+    \(NCrypt[number_, key_] := 
+      PowerMod[number, key[\([1]\)], key[\([2]\)]]\)], "Input"],
+
+Cell[BoxData[
+    \(StringToNumber[string_] := 
+      FromDigits[Flatten[IntegerDigits[ToCharacterCode[string], 2, 8]], 
+        2]\)], "Input"],
+
+Cell[BoxData[
+    \(NumberToString[number_] := 
+      Block[{bitlist}, \[IndentingNewLine]bitlist = 
+          IntegerDigits[number, 2]; \[IndentingNewLine]FromCharacterCode[
+          Map[FromDigits[#, 2] &, 
+            Partition[PadLeft[bitlist, 8\ Ceiling[Length[bitlist]/8]], 
+              8]]]]\)], "Input"],
+
+Cell[TextData[{
+  "Crypt[] is the old version of BlockCrypt[] and does not work for strings \
+longer than ",
+  Cell[BoxData[
+      \(TraditionalForm\`1/
+          8\^th\ times\ the\ bitlength\ of\ the\ \(\(keys\)\(.\)\(\ \)\)\)]]
+}], "Text"],
+
+Cell[BoxData[
+    \(Crypt[string_, key_] := 
+      Block[{number, crypted}, \[IndentingNewLine]number = 
+          StringToNumber[string]; \[IndentingNewLine]crypted = 
+          NCrypt[number, key]; \[IndentingNewLine]NumberToString[
+          crypted]]\)], "Input"],
+
+Cell["\<\
+BlockCrypt[] partitions strings into blocks and encrypts them \
+individually.\
+\>", "Text"],
+
+Cell[BoxData[
+    \(BlockCrypt[string_, key_] := 
+      Block[{bits, stringblocks, numberblocks, 
+          cryptedblocks}, \[IndentingNewLine]bits = 
+          key[\([3]\)]; \[IndentingNewLine]stringblocks = 
+          PartitionString[string, 
+            Floor[bits/8]]; \[IndentingNewLine]numberblocks = 
+          Map[StringToNumber, 
+            stringblocks]; \[IndentingNewLine]cryptedblocks = 
+          Map[NCrypt[#, key] &, numberblocks]; \[IndentingNewLine]StringJoin[
+          Map[NumberToString, cryptedblocks]]]\)], "Input"],
+
+Cell[BoxData[
+    \(Encrypt[string_, publickey_] := 
+      BlockCrypt[string, publickey]\)], "Input"],
+
+Cell[BoxData[
+    \(Decrypt[string_, secretkey_] := 
+      BlockCrypt[string, secretkey]\)], "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Encryption and decryption", "Section"],
+
+Cell[CellGroupData[{
+
+Cell["Generate keys", "Subsection"],
+
+Cell[BoxData[
+    \(\({publickey, secretkey} = GenerateKeys[1024];\)\)], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Encrypt / decrypt message", "Subsection"],
+
+Cell[BoxData[{
+    \(\(message = "\<The magic words are sqeamish ossifrage. Let's try if it \
+also works with longer messages. Of course the easiest way to get long \
+messages is to use <cut> and <paste> a few times: the quick brown fox jumps \
+over the lazy dog, the quick brown fox jumps over the lazy dog, the quick \
+brown fox jumps over the lazy dog, the quick brown fox jumps over the lazy \
+dog, ... the quick brown fox keeps jumping over the lazy dog... Is this long \
+enough?\>";\)\), "\n", 
+    \(\(encoded = Encrypt[message, publickey];\)\), "\n", 
+    \(decoded = Decrypt[encoded, secretkey]\)}], "Input"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+},
+FrontEndVersion->"5.2 for Macintosh",
+ScreenRectangle->{{0, 1024}, {0, 696}},
+WindowSize->{913, 671},
+WindowMargins->{{4, Automatic}, {Automatic, 1}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 27, 0, 88, "Title"],
+Cell[1806, 55, 39, 0, 52, "Subtitle"],
+Cell[1848, 57, 78, 3, 46, "Subsubtitle"],
+
+Cell[CellGroupData[{
+Cell[1951, 64, 35, 0, 69, "Section"],
+
+Cell[CellGroupData[{
+Cell[2011, 68, 39, 0, 38, "Subsection"],
+Cell[2053, 70, 454, 8, 107, "Input"],
+Cell[2510, 80, 219, 4, 43, "Input"],
+Cell[2732, 86, 112, 2, 27, "Input"],
+Cell[2847, 90, 129, 2, 27, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[3013, 97, 35, 0, 38, "Subsection"],
+Cell[3051, 99, 960, 18, 190, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[4048, 122, 44, 0, 38, "Subsection"],
+Cell[4095, 124, 109, 2, 27, "Input"],
+Cell[4207, 128, 144, 3, 27, "Input"],
+Cell[4354, 133, 314, 6, 75, "Input"],
+Cell[4671, 141, 241, 6, 30, "Text"],
+Cell[4915, 149, 267, 5, 75, "Input"],
+Cell[5185, 156, 101, 3, 30, "Text"],
+Cell[5289, 161, 539, 10, 107, "Input"],
+Cell[5831, 173, 101, 2, 27, "Input"],
+Cell[5935, 177, 101, 2, 27, "Input"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+Cell[6085, 185, 44, 0, 39, "Section"],
+
+Cell[CellGroupData[{
+Cell[6154, 189, 35, 0, 38, "Subsection"],
+Cell[6192, 191, 81, 1, 27, "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[6310, 197, 47, 0, 38, "Subsection"],
+Cell[6360, 199, 617, 9, 139, "Input"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+
