@@ -1,2 +1,2 @@
-# old_projects
-Archived projects (high school and university)
+# mathematica_projects
+Archived Mathematica projects, mostly created while in university
